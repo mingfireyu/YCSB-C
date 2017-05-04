@@ -10,15 +10,26 @@
 #define YCSB_C_CLIENT_H_
 
 #include <string>
+#include <boost/concept_check.hpp>
 #include "db.h"
 #include "core_workload.h"
 #include "utils.h"
-
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
 namespace ycsbc {
 
 class Client {
  public:
-  Client(DB &db, CoreWorkload &wl) : db_(db), workload_(wl) { }
+  Client(DB &db, CoreWorkload &wl) : db_(db), workload_(wl) { 
+	if(wl.with_timestamp_){
+	    timestamp_trace_fp_ = wl.timestamp_trace_fp_;
+	}else{
+	    timestamp_trace_fp_ = NULL;
+	}
+	line_ = NULL;
+	first_do_transaction = false;
+  }
   
   virtual bool DoInsert();
   virtual bool DoTransaction();
@@ -32,9 +43,15 @@ class Client {
   virtual int TransactionScan();
   virtual int TransactionUpdate();
   virtual int TransactionInsert();
-  
+  void getCurrentTimeStamp();
   DB &db_;
   CoreWorkload &workload_;
+  char *line_;
+  FILE *timestamp_trace_fp_;
+  boost::timer timer_;
+  bool first_do_transaction;
+  double current_time_;
+  double current_timestamp_;
 };
 
 inline bool Client::DoInsert() {
@@ -46,6 +63,19 @@ inline bool Client::DoInsert() {
 
 inline bool Client::DoTransaction() {
   int status = -1;
+  if(!first_do_transaction){
+	timer_.restart();
+	first_do_transaction = true;
+  }
+  if(timestamp_trace_fp_){
+	 current_time_ = timer_.elapsed()*1000000;
+	 getCurrentTimeStamp();
+	double delay =  current_timestamp_ - current_time_;
+	printf("current_time_:%.2lf current_timestamp_:%.2lf \n",current_time_,current_timestamp_);
+	if(delay > 0){
+	    usleep((unsigned int)delay);
+	}
+  }
   switch (workload_.NextOperation()) {
     case READ:
       status = TransactionRead();
@@ -137,6 +167,12 @@ inline int Client::TransactionInsert() {
   workload_.BuildValues(values);
   return db_.Insert(table, key, values);
 } 
+
+inline void Client::getCurrentTimeStamp(){
+	size_t len = 0;
+	getline(&line_,&len,timestamp_trace_fp_);
+	sscanf(line_,"%lf,",&current_timestamp_);
+}
 
 } // ycsbc
 

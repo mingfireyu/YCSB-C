@@ -14,11 +14,11 @@
 #include "db/redis_db.h"
 #include "db/tbb_rand_db.h"
 #include "db/tbb_scan_db.h"
-
+#include "db/leveldb_db.h"
 using namespace std;
 using ycsbc::DB;
 using ycsbc::DBFactory;
-
+using ycsbc::LevelDB;
 DB* DBFactory::CreateDB(utils::Properties &props) {
   if (props["dbname"] == "basic") {
     return new BasicDB;
@@ -32,6 +32,9 @@ DB* DBFactory::CreateDB(utils::Properties &props) {
     return new TbbRandDB;
   } else if (props["dbname"] == "tbb_scan") {
     return new TbbScanDB;
-  } else return NULL;
+  } else if (props["dbname"] == "leveldb"){
+	return new LevelDB(props["dbfilename"].c_str());
+   } 
+  else return NULL;
 }
 

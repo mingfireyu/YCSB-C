@@ -11,13 +11,15 @@
 
 #include <vector>
 #include <string>
+#include <stdlib.h>
+#include <stdio.h>
 #include "db.h"
 #include "properties.h"
 #include "generator.h"
 #include "discrete_generator.h"
 #include "counter_generator.h"
 #include "utils.h"
-
+#include <boost/timer.hpp>
 namespace ycsbc {
 
 enum Operation {
@@ -132,7 +134,13 @@ class CoreWorkload {
   
   static const std::string RECORD_COUNT_PROPERTY;
   static const std::string OPERATION_COUNT_PROPERTY;
-
+  
+  static const std::string WITH_TIMESTAMP_PROPERTY;
+  static const std::string WITH_TIMESTAMP_PROPERTY_DEFAULT;
+  
+  static const std::string TIMESTAMP_TRACEFILENAME_PROPERTY;
+  static const std::string TIMESTAMP_TRACEFILENAME_PROPERTY_DEFAULT;
+  
   ///
   /// Initialize the scenario.
   /// Called once, in the main client thread, before any operations are started.
@@ -165,6 +173,7 @@ class CoreWorkload {
     if (key_chooser_) delete key_chooser_;
     if (field_chooser_) delete field_chooser_;
     if (scan_len_chooser_) delete scan_len_chooser_;
+    if(timestamp_trace_fp_) fclose(timestamp_trace_fp_);
   }
   
  protected:
@@ -184,6 +193,9 @@ class CoreWorkload {
   CounterGenerator insert_key_sequence_;
   bool ordered_inserts_;
   size_t record_count_;
+public:
+  bool with_timestamp_;
+  FILE *timestamp_trace_fp_;
 };
 
 inline std::string CoreWorkload::NextSequenceKey() {

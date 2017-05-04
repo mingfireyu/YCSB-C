@@ -22,7 +22,7 @@ const string CoreWorkload::TABLENAME_PROPERTY = "table";
 const string CoreWorkload::TABLENAME_DEFAULT = "usertable";
 
 const string CoreWorkload::FIELD_COUNT_PROPERTY = "fieldcount";
-const string CoreWorkload::FIELD_COUNT_DEFAULT = "10";
+const string CoreWorkload::FIELD_COUNT_DEFAULT = "1";   //fieldcount = 1
 
 const string CoreWorkload::FIELD_LENGTH_DISTRIBUTION_PROPERTY =
     "field_len_dist";
@@ -73,6 +73,10 @@ const string CoreWorkload::INSERT_START_DEFAULT = "0";
 const string CoreWorkload::RECORD_COUNT_PROPERTY = "recordcount";
 const string CoreWorkload::OPERATION_COUNT_PROPERTY = "operationcount";
 
+const string CoreWorkload::WITH_TIMESTAMP_PROPERTY = "withtimestamp";
+const string CoreWorkload::WITH_TIMESTAMP_PROPERTY_DEFAULT = "false";
+const std::string CoreWorkload::TIMESTAMP_TRACEFILENAME_PROPERTY = "timestamptracefilename";
+const std::string CoreWorkload::TIMESTAMP_TRACEFILENAME_PROPERTY_DEFAULT = "trace.txt";
 void CoreWorkload::Init(const utils::Properties &p) {
   table_name_ = p.GetProperty(TABLENAME_PROPERTY,TABLENAME_DEFAULT);
   
@@ -106,6 +110,15 @@ void CoreWorkload::Init(const utils::Properties &p) {
   write_all_fields_ = utils::StrToBool(p.GetProperty(WRITE_ALL_FIELDS_PROPERTY,
                                                      WRITE_ALL_FIELDS_DEFAULT));
   
+  with_timestamp_ = utils::StrToBool(p.GetProperty(WITH_TIMESTAMP_PROPERTY,
+						   WITH_TIMESTAMP_PROPERTY_DEFAULT));
+  
+  if(with_timestamp_){
+	timestamp_trace_fp_ = fopen(p.GetProperty(TIMESTAMP_TRACEFILENAME_PROPERTY,
+						TIMESTAMP_TRACEFILENAME_PROPERTY_DEFAULT).c_str(),"r");
+  }else{
+	timestamp_trace_fp_  = NULL;
+  }
   if (p.GetProperty(INSERT_ORDER_PROPERTY, INSERT_ORDER_DEFAULT) == "hashed") {
     ordered_inserts_ = false;
   } else {
@@ -162,6 +175,8 @@ void CoreWorkload::Init(const utils::Properties &p) {
     throw utils::Exception("Distribution not allowed for scan length: " +
         scan_len_dist);
   }
+  
+  
 }
 
 ycsbc::Generator<uint64_t> *CoreWorkload::GetFieldLenGenerator(
