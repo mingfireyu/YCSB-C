@@ -138,6 +138,9 @@ class CoreWorkload {
   static const std::string WITH_TIMESTAMP_PROPERTY;
   static const std::string WITH_TIMESTAMP_PROPERTY_DEFAULT;
   
+  static const std::string WITH_OPERATION_PROPERTY;
+  static const std:: string WITH_OPERATION_PROPERTY_DEFAULT;
+  
   static const std::string TIMESTAMP_TRACEFILENAME_PROPERTY;
   static const std::string TIMESTAMP_TRACEFILENAME_PROPERTY_DEFAULT;
   
@@ -195,6 +198,7 @@ class CoreWorkload {
   size_t record_count_;
 public:
   bool with_timestamp_;
+  bool with_operation_; //operation come from trace;
   FILE *timestamp_trace_fp_;
 };
 
@@ -212,10 +216,12 @@ inline std::string CoreWorkload::NextTransactionKey() {
 }
 
 inline std::string CoreWorkload::BuildKeyName(uint64_t key_num) {
+  char key[100];
   if (!ordered_inserts_) {
     key_num = utils::Hash(key_num);
   }
-  return std::string("user").append(std::to_string(key_num));
+  snprintf(key, sizeof(key), "%020lu", key_num);
+  return std::string("user").append(std::string(key,20));
 }
 
 inline std::string CoreWorkload::NextFieldName() {

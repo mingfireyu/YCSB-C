@@ -75,6 +75,10 @@ const string CoreWorkload::OPERATION_COUNT_PROPERTY = "operationcount";
 
 const string CoreWorkload::WITH_TIMESTAMP_PROPERTY = "withtimestamp";
 const string CoreWorkload::WITH_TIMESTAMP_PROPERTY_DEFAULT = "false";
+
+const string CoreWorkload::WITH_OPERATION_PROPERTY = "withoperation";
+const string CoreWorkload::WITH_OPERATION_PROPERTY_DEFAULT = "false";
+
 const std::string CoreWorkload::TIMESTAMP_TRACEFILENAME_PROPERTY = "timestamptracefilename";
 const std::string CoreWorkload::TIMESTAMP_TRACEFILENAME_PROPERTY_DEFAULT = "trace.txt";
 void CoreWorkload::Init(const utils::Properties &p) {
@@ -112,6 +116,9 @@ void CoreWorkload::Init(const utils::Properties &p) {
   
   with_timestamp_ = utils::StrToBool(p.GetProperty(WITH_TIMESTAMP_PROPERTY,
 						   WITH_TIMESTAMP_PROPERTY_DEFAULT));
+  
+  with_operation_ = utils::StrToBool(p.GetProperty(WITH_OPERATION_PROPERTY,
+						    WITH_OPERATION_PROPERTY_DEFAULT));
   
   if(with_timestamp_){
 	timestamp_trace_fp_ = fopen(p.GetProperty(TIMESTAMP_TRACEFILENAME_PROPERTY,

@@ -16,7 +16,7 @@
 #include "core/client.h"
 #include "core/core_workload.h"
 #include "db/db_factory.h"
-
+#include<boost/timer.hpp>
 using namespace std;
 
 void UsageMessage(const char *command);
@@ -26,14 +26,22 @@ string ParseCommandLine(int argc, const char *argv[], utils::Properties &props);
 int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
     bool is_loading) {
   db->Init();
+  int ops[2] = {0,0};
+  double durations[] = {0,0};
   ycsbc::Client client(*db, *wl);
   int oks = 0;
   for (int i = 0; i < num_ops; ++i) {
     if (is_loading) {
       oks += client.DoInsert();
     } else {
-      oks += client.DoTransaction();
+      oks += client.DoTransaction(ops,durations);
     }
+  }
+  if(!is_loading){
+    cerr<<"WRITE latency"<<endl;
+    cerr<<durations[ycsbc::Operation::INSERT]/ops[ycsbc::Operation::INSERT]<<"us"<<"Write ops:"<<ops[ycsbc::Operation::INSERT]<<endl;
+    cerr<<"READ latency"<<endl;
+    cerr<<durations[ycsbc::Operation::READ]/ops[ycsbc::Operation::READ]<<"us"<<"Read ops:"<<ops[ycsbc::Operation::READ]<<endl;;
   }
   db->Close();
   return oks;
@@ -55,6 +63,7 @@ int main(const int argc, const char *argv[]) {
   const int num_threads = stoi(props.GetProperty("threadcount", "1"));
 
   // Loads data
+  boost::timer loadRunTimer;
   vector<future<int>> actual_ops;
   int total_ops = stoi(props[ycsbc::CoreWorkload::RECORD_COUNT_PROPERTY]);
   for (int i = 0; i < num_threads; ++i) {
@@ -69,7 +78,8 @@ int main(const int argc, const char *argv[]) {
     sum += n.get();
   }
   cerr << "# Loading records:\t" << sum << endl;
-
+  cerr << "load time: " << loadRunTimer.elapsed()*1000000 <<"us"<<endl;
+  loadRunTimer.restart();
   // Peforms transactions
   actual_ops.clear();
   total_ops = stoi(props[ycsbc::CoreWorkload::OPERATION_COUNT_PROPERTY]);
@@ -88,8 +98,10 @@ int main(const int argc, const char *argv[]) {
   }
   double duration = timer.End();
   cerr << "# Transaction throughput (KTPS)" << endl;
-  cerr << props["dbname"] << '\t' << file_name << '\t' << num_threads << '\t';
+  cerr << props["dbname"] << '\t' << file_name << '\t' << num_threads << '\t'<<endl;;
+  cerr << "run time: " << loadRunTimer.elapsed()*1000000 <<"us"<<endl;
   cerr << total_ops / duration / 1000 << endl;
+  delete db;
 }
 
 string ParseCommandLine(int argc, const char *argv[], utils::Properties &props) {
@@ -160,9 +172,15 @@ string ParseCommandLine(int argc, const char *argv[], utils::Properties &props) 
 	}
 	props.SetProperty("dbfilename", argv[argindex]);
         argindex++;
-    }
-    
-    else {
+    }else if(strcmp(argv[argindex],"-configpath") == 0){
+	argindex++;
+	if(argindex >= argc){
+	    UsageMessage(argv[0]);
+	    exit(0);
+	}
+	props.SetProperty("configpath", argv[argindex]);
+        argindex++;
+    }else {
       cout << "Unknown option '" << argv[argindex] << "'" << endl;
       exit(0);
     }
