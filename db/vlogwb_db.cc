@@ -59,6 +59,9 @@ int VLogDB::Update(const string& table, const string& key, vector< DB::KVPair >&
     return Insert(table,key,values);
 }
 
+void VLogDB::openStatistics() {
+  db_->openStatistics();
+}
 VLogDB::~VLogDB()
 {
     printf("delete VLogDB\n");

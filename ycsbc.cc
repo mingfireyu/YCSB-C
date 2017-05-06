@@ -36,7 +36,11 @@ int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
     } else {
       oks += client.DoTransaction(ops,durations);
     }
+    if(i%10000 == 0){
+      cerr<<"operation count:"<<i<<"\r";
+    }
   }
+  cerr<<endl;
   if(!is_loading){
     cerr<<"WRITE latency"<<endl;
     cerr<<durations[ycsbc::Operation::INSERT]/ops[ycsbc::Operation::INSERT]<<"us"<<"Write ops:"<<ops[ycsbc::Operation::INSERT]<<endl;
@@ -84,6 +88,7 @@ int main(const int argc, const char *argv[]) {
   actual_ops.clear();
   total_ops = stoi(props[ycsbc::CoreWorkload::OPERATION_COUNT_PROPERTY]);
   utils::Timer<double> timer;
+  db->openStatistics();
   timer.Start();
   for (int i = 0; i < num_threads; ++i) {
     actual_ops.emplace_back(async(launch::async,

@@ -29,6 +29,7 @@ class Client {
 	    timestamp_trace_fp_ = NULL;
 	}
 	if(wl.with_operation_){
+	  printf("operation from trace!\n");
 	    current_operation_ = boost::make_shared<ycsbc::Operation>(ycsbc::Operation::READ);
 	}else{
 	    current_operation_ = nullptr;
@@ -90,17 +91,17 @@ inline bool Client::DoTransaction(int ops[],double durations[]) {
   switch (operations) {
     case READ:
       status = TransactionRead();
-      durations[READ] += transaction_timer.elapsed();
+      durations[READ] += (transaction_timer.elapsed()*1000000);
       ops[READ]++;
       break;
     case UPDATE:
       status = TransactionUpdate();
-      durations[INSERT] += transaction_timer.elapsed();
+      durations[INSERT] += (transaction_timer.elapsed()*1000000);
       ops[INSERT]++;
       break;
     case INSERT:
       status = TransactionInsert();
-      durations[INSERT] += transaction_timer.elapsed();
+      durations[INSERT] += (transaction_timer.elapsed()*1000000);
       ops[INSERT]++;
       break;
     case SCAN:
@@ -191,7 +192,7 @@ inline void Client::getCurrentTimeStamp(){
 	getline(&line_,&len,timestamp_trace_fp_);
 	if(current_operation_){
 	    sscanf(line_,"%lf,%c",&current_timestamp_,&operation);
-	    *current_operation_ = operation == 'w' ? ycsbc::Operation::INSERT:ycsbc::Operation::READ;
+	    *current_operation_ = operation == 'w' ? ycsbc::Operation::UPDATE:ycsbc::Operation::READ;
 	}else{
 	    sscanf(line_,"%lf,",&current_timestamp_);
 	}

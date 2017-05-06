@@ -29,6 +29,8 @@ public :
 
   int Delete(const std::string &table, const std::string &key);
     virtual ~VLogDB();
+  void openStatistics();
+
 
 private:
     VLogWB *db_;
