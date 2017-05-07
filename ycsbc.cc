@@ -103,9 +103,9 @@ int main(const int argc, const char *argv[]) {
   }
   double duration = timer.End();
   cerr << "# Transaction throughput (KTPS)" << endl;
+  cerr << total_ops / duration / 1000 << endl;
   cerr << props["dbname"] << '\t' << file_name << '\t' << num_threads << '\t'<<endl;;
   cerr << "run time: " << loadRunTimer.elapsed()*1000000 <<"us"<<endl;
-  cerr << total_ops / duration / 1000 << endl;
   delete db;
 }
 

@@ -18,8 +18,28 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<unistd.h>
+#include<sys/time.h>
 namespace ycsbc {
 
+class WallTimer{
+public:
+        static const unsigned long long S2US;
+	void Start(){
+		    gettimeofday(&start_time_,NULL);
+	}
+	static unsigned long long inline  timevalTous(struct timeval &res) {
+		    return res.tv_sec * S2US + res.tv_usec;
+	}
+	unsigned long long elapsed(){
+	    gettimeofday(&end_time_,NULL);
+	    timersub(&end_time_,&start_time_,&res_);
+	    return timevalTous(res_); 
+	}
+private:
+	struct timeval start_time_;
+	 struct timeval end_time_,res_;
+};
+const unsigned long long WallTimer::S2US = 1000000;
 class Client {
  public:
   Client(DB &db, CoreWorkload &wl) : db_(db), workload_(wl) { 
@@ -56,7 +76,7 @@ class Client {
   char *line_;
   boost::shared_ptr<ycsbc::Operation> current_operation_;
   FILE *timestamp_trace_fp_;
-  boost::timer timer_;
+  WallTimer timer_;
   bool first_do_transaction;
   double current_time_;
   double current_timestamp_;
@@ -74,34 +94,35 @@ inline bool Client::DoTransaction(int ops[],double durations[]) {
   int status = -1;
   
   if(!first_do_transaction){
-	timer_.restart();
+	timer_.Start();
 	first_do_transaction = true;
   }
   if(timestamp_trace_fp_){
-	 current_time_ = timer_.elapsed()*1000000;
+	 current_time_ = timer_.elapsed();
 	 getCurrentTimeStamp();
 	double delay =  current_timestamp_ - current_time_;
-	//printf("current_time_:%.2lf current_timestamp_:%.2lf \n",current_time_,current_timestamp_);
 	if(delay > 0){
 	    usleep((unsigned int)delay);
+	    printf("current_time_:%.2lf current_timestamp_:%.2lf delay:%.2lf \n",current_time_,current_timestamp_,delay);
 	}
   }
-  boost::timer transaction_timer;
+ WallTimer transaction_timer;
+ transaction_timer.Start();
   ycsbc::Operation operations = current_operation_ == nullptr ?workload_.NextOperation():*current_operation_;
   switch (operations) {
     case READ:
       status = TransactionRead();
-      durations[READ] += (transaction_timer.elapsed()*1000000);
+      durations[READ] += (transaction_timer.elapsed());
       ops[READ]++;
       break;
     case UPDATE:
       status = TransactionUpdate();
-      durations[INSERT] += (transaction_timer.elapsed()*1000000);
+      durations[INSERT] += (transaction_timer.elapsed());
       ops[INSERT]++;
       break;
     case INSERT:
       status = TransactionInsert();
-      durations[INSERT] += (transaction_timer.elapsed()*1000000);
+      durations[INSERT] += (transaction_timer.elapsed());
       ops[INSERT]++;
       break;
     case SCAN:
@@ -191,10 +212,16 @@ inline void Client::getCurrentTimeStamp(){
 	char operation;
 	getline(&line_,&len,timestamp_trace_fp_);
 	if(current_operation_){
-	    sscanf(line_,"%lf,%c",&current_timestamp_,&operation);
+	  if(sscanf(line_,"%lf,%c",&current_timestamp_,&operation)!=2){
+	    fprintf(stderr,"error in sscanf");
+	    exit(0);
+	  }
 	    *current_operation_ = operation == 'w' ? ycsbc::Operation::UPDATE:ycsbc::Operation::READ;
 	}else{
-	    sscanf(line_,"%lf,",&current_timestamp_);
+	  if(sscanf(line_,"%lf,",&current_timestamp_)!=1){
+	    fprintf(stderr,"error in sscanf");
+	    exit(0);
+	  }
 	}
 }
 
