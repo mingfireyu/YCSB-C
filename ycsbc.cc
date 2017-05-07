@@ -67,7 +67,8 @@ int main(const int argc, const char *argv[]) {
   const int num_threads = stoi(props.GetProperty("threadcount", "1"));
 
   // Loads data
-  boost::timer loadRunTimer;
+  ycsbc::WallTimer loadRunTimer;
+  loadRunTimer.Start();
   vector<future<int>> actual_ops;
   int total_ops = stoi(props[ycsbc::CoreWorkload::RECORD_COUNT_PROPERTY]);
   for (int i = 0; i < num_threads; ++i) {
@@ -82,12 +83,12 @@ int main(const int argc, const char *argv[]) {
     sum += n.get();
   }
   cerr << "# Loading records:\t" << sum << endl;
-  cerr << "load time: " << loadRunTimer.elapsed()*1000000 <<"us"<<endl;
-  loadRunTimer.restart();
+  cerr << "load time: " << loadRunTimer.elapsed() <<"us"<<endl;
+  //loadRunTimer.restart();
   // Peforms transactions
   actual_ops.clear();
   total_ops = stoi(props[ycsbc::CoreWorkload::OPERATION_COUNT_PROPERTY]);
-  utils::Timer<double> timer;
+  ycsbc::WallTimer timer;
   db->openStatistics();
   timer.Start();
   for (int i = 0; i < num_threads; ++i) {
@@ -101,11 +102,12 @@ int main(const int argc, const char *argv[]) {
     assert(n.valid());
     sum += n.get();
   }
-  double duration = timer.End();
+  double duration = timer.elapsed();
+  cerr<< endl;
   cerr << "# Transaction throughput (KTPS)" << endl;
-  cerr << total_ops / duration / 1000 << endl;
+  cerr << total_ops / (duration/1000000) / 1000 << endl;
   cerr << props["dbname"] << '\t' << file_name << '\t' << num_threads << '\t'<<endl;;
-  cerr << "run time: " << loadRunTimer.elapsed()*1000000 <<"us"<<endl;
+  cerr << "run time: " << timer.elapsed() <<"us"<<endl;
   delete db;
 }
 
