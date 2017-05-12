@@ -46,6 +46,12 @@ int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
     cerr<<durations[ycsbc::Operation::INSERT]/ops[ycsbc::Operation::INSERT]<<"us"<<"Write ops:"<<ops[ycsbc::Operation::INSERT]<<endl;
     cerr<<"READ latency"<<endl;
     cerr<<durations[ycsbc::Operation::READ]/ops[ycsbc::Operation::READ]<<"us"<<"Read ops:"<<ops[ycsbc::Operation::READ]<<endl;;
+
+    cout<<"WRITE latency"<<endl;
+    cout<<durations[ycsbc::Operation::INSERT]/ops[ycsbc::Operation::INSERT]<<"us"<<"Write ops:"<<ops[ycsbc::Operation::INSERT]<<endl;
+    cout<<"READ latency"<<endl;
+    cout<<durations[ycsbc::Operation::READ]/ops[ycsbc::Operation::READ]<<"us"<<"Read ops:"<<ops[ycsbc::Operation::READ]<<endl;;
+
   }
   db->Close();
   return oks;
@@ -71,6 +77,7 @@ int main(const int argc, const char *argv[]) {
   loadRunTimer.Start();
   vector<future<int>> actual_ops;
   int total_ops = stoi(props[ycsbc::CoreWorkload::RECORD_COUNT_PROPERTY]);
+  db->openStatistics();
   for (int i = 0; i < num_threads; ++i) {
     actual_ops.emplace_back(async(launch::async,
         DelegateClient, db, &wl, total_ops / num_threads, true));
@@ -84,12 +91,15 @@ int main(const int argc, const char *argv[]) {
   }
   cerr << "# Loading records:\t" << sum << endl;
   cerr << "load time: " << loadRunTimer.elapsed() <<"us"<<endl;
+  cout << "# Loading records:\t" << sum << endl;
+  cout << "load time: " << loadRunTimer.elapsed() <<"us"<<endl;
+
   //loadRunTimer.restart();
   // Peforms transactions
   actual_ops.clear();
   total_ops = stoi(props[ycsbc::CoreWorkload::OPERATION_COUNT_PROPERTY]);
   ycsbc::WallTimer timer;
-  db->openStatistics();
+  //  db->openStatistics();
   timer.Start();
   for (int i = 0; i < num_threads; ++i) {
     actual_ops.emplace_back(async(launch::async,
@@ -108,6 +118,11 @@ int main(const int argc, const char *argv[]) {
   cerr << total_ops / (duration/1000000) / 1000 << endl;
   cerr << props["dbname"] << '\t' << file_name << '\t' << num_threads << '\t'<<endl;;
   cerr << "run time: " << timer.elapsed() <<"us"<<endl;
+  cout << "# Transaction throughput (KTPS)" << endl;
+  cout << total_ops / (duration/1000000) / 1000 << endl;
+  cout << props["dbname"] << '\t' << file_name << '\t' << num_threads << '\t'<<endl;;
+  cout << "run time: " << timer.elapsed() <<"us"<<endl;
+
   delete db;
 }
 

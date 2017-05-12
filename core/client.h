@@ -103,7 +103,7 @@ inline bool Client::DoTransaction(int ops[],double durations[]) {
 	double delay =  current_timestamp_ - current_time_;
 	if(delay > 0){
 	    usleep((unsigned int)delay);
-	    printf("current_time_:%.2lf current_timestamp_:%.2lf delay:%.2lf \n",current_time_,current_timestamp_,delay);
+	    //printf("current_time_:%.2lf current_timestamp_:%.2lf delay:%.2lf \n",current_time_,current_timestamp_,delay);
 	}
   }
  WallTimer transaction_timer;
