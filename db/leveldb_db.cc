@@ -1,14 +1,45 @@
 #include "leveldb_db.h"
 #include <cstring>
-
+#include"basic_config.hh"
 using namespace std;
 
 namespace ycsbc {
-LevelDB::LevelDB(const char* dbfilename)
+LevelDB::LevelDB(const char* dbfilename,const char* configPath)
 {
     leveldb::Options options;
+    LevelDB_ConfigMod::getInstance().setConfigPath(configPath);
+    std::string bloom_filename;
+    char *bloom_filename_char;
+    int bloom_bits;
+    int max_open_files = LevelDB_ConfigMod::getInstance().getMax_open_files();
+    int max_File_sizes = LevelDB_ConfigMod::getInstance().getMax_file_size();
+    bool hierarchical_bloom_flag = LevelDB_ConfigMod::getInstance().getHierarchical_bloom_flag();
+    bool log_open = LevelDB_ConfigMod::getInstance().getOpen_log();
+    options.log_open = log_open;
+    bool compression_Open = LevelDB_ConfigMod::getInstance().getCompression_flag();
+    if(hierarchical_bloom_flag){
+	bloom_filename = LevelDB_ConfigMod::getInstance().getBloom_filename();
+	bloom_filename_char = (char *)malloc(sizeof(char)*bloom_filename.size()+1);
+	strncpy(bloom_filename_char,bloom_filename.c_str(),bloom_filename.size());
+	bloom_filename_char[bloom_filename.size()] = 0;
+    }else{
+	bloom_bits = LevelDB_ConfigMod::getInstance().getBloom_bits();
+    }
+    
     options.create_if_missing = true;
-    options.compression = leveldb::kNoCompression;  //compression is disabled.
+    options.compression = compression_Open?leveldb::kSnappyCompression:leveldb::kNoCompression;  //compression is disabled.
+    options.max_file_size = max_File_sizes;
+    options.max_open_files = max_open_files;
+    /*if(!log_open){
+	
+    }*/
+    if(hierarchical_bloom_flag){
+	void *bloom_filename_ptr = (void *)bloom_filename_char;
+	options.filter_policy = leveldb::NewBloomFilterPolicy(bloom_filename_ptr);
+    }else{
+	void *bloom_bits_ptr = (void *)(&bloom_bits);
+	options.filter_policy = leveldb::NewBloomFilterPolicy(bloom_bits_ptr);
+    }
     leveldb::Status status = leveldb::DB::Open(options,dbfilename, &db_);
     if(!status.ok()){
 	fprintf(stderr,"can't open leveldb\n");
@@ -68,6 +99,14 @@ int LevelDB::Update(const string& table, const string& key, vector< DB::KVPair >
 {
     return Insert(table,key,values);
 }
+
+void LevelDB::Close()
+{
+    std::string stat_str;
+    db_->GetProperty("leveldb.stats",&stat_str);
+    cout<<stat_str<<endl;
+}
+
 
 LevelDB::~LevelDB()
 {

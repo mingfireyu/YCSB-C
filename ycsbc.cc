@@ -65,28 +65,31 @@ int main(const int argc, const char *argv[]) {
   wl.Init(props);
 
   const int num_threads = stoi(props.GetProperty("threadcount", "1"));
-
+  bool skipLoad = utils::StrToBool(props.GetProperty("skipLoad",
+						   "false"));
   // Loads data
   ycsbc::WallTimer loadRunTimer;
   loadRunTimer.Start();
   vector<future<int>> actual_ops;
   int total_ops = stoi(props[ycsbc::CoreWorkload::RECORD_COUNT_PROPERTY]);
-  for (int i = 0; i < num_threads; ++i) {
-    actual_ops.emplace_back(async(launch::async,
-        DelegateClient, db, &wl, total_ops / num_threads, true));
-  }
-  assert((int)actual_ops.size() == num_threads);
-
   int sum = 0;
-  for (auto &n : actual_ops) {
-    assert(n.valid());
-    sum += n.get();
-  }
-  cerr << "# Loading records:\t" << sum << endl;
-  cerr << "load time: " << loadRunTimer.elapsed() <<"us"<<endl;
-  //loadRunTimer.restart();
-  // Peforms transactions
-  actual_ops.clear();
+  if(!skipLoad){
+	for (int i = 0; i < num_threads; ++i) {
+	    actual_ops.emplace_back(async(launch::async,
+		DelegateClient, db, &wl, total_ops / num_threads, true));
+	}
+	assert((int)actual_ops.size() == num_threads);
+	for (auto &n : actual_ops) {
+	    assert(n.valid());
+	    sum += n.get();
+	}
+	cerr << "# Loading records:\t" << sum << endl;
+	cerr << "load time: " << loadRunTimer.elapsed() <<"us"<<endl;
+    
+    //loadRunTimer.restart();
+    // Peforms transactions
+	actual_ops.clear();
+   }
   total_ops = stoi(props[ycsbc::CoreWorkload::OPERATION_COUNT_PROPERTY]);
   ycsbc::WallTimer timer;
   db->openStatistics();
@@ -187,7 +190,16 @@ string ParseCommandLine(int argc, const char *argv[], utils::Properties &props) 
 	}
 	props.SetProperty("configpath", argv[argindex]);
         argindex++;
-    }else {
+    }else if(strcmp(argv[argindex],"-skipLoad") == 0){
+	argindex++;
+	if(argindex >= argc){
+	    UsageMessage(argv[0]);
+	    exit(0);
+	}
+	props.SetProperty("skipLoad", argv[argindex]);
+        argindex++;
+    }
+    else {
       cout << "Unknown option '" << argv[argindex] << "'" << endl;
       exit(0);
     }
