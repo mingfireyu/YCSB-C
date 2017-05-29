@@ -118,6 +118,7 @@ int main(const int argc, const char *argv[]) {
 string ParseCommandLine(int argc, const char *argv[], utils::Properties &props) {
   int argindex = 1;
   string filename;
+  string latency_filename;
   while (argindex < argc && StrStartWith(argv[argindex], "-")) {
     if (strcmp(argv[argindex], "-threads") == 0) {
       argindex++;
@@ -199,8 +200,7 @@ string ParseCommandLine(int argc, const char *argv[], utils::Properties &props) 
 	}
 	props.SetProperty("skipLoad", argv[argindex]);
         argindex++;
-    }
-    else {
+    }else {
       cout << "Unknown option '" << argv[argindex] << "'" << endl;
       exit(0);
     }

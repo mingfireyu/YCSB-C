@@ -54,6 +54,12 @@ class Client {
 	}else{
 	    current_operation_ = nullptr;
 	}
+	if(wl.with_latency_filename_){
+	    printf("output latency to filename :%s \n",wl.LATENCYFILENAME_PROPERTY.c_str());
+	    latency_fp_ = wl.latency_fp_;
+	}else{
+	    latency_fp_ = NULL;
+	}
 	line_ = NULL;
 	first_do_transaction = false;
   }
@@ -61,7 +67,11 @@ class Client {
   virtual bool DoInsert();
   virtual bool DoTransaction(int ops[],double durations[]);
   
-  virtual ~Client() { }
+  virtual ~Client() { 
+      if(latency_fp_){
+	fclose(latency_fp_);
+      }
+ }
   
  protected:
   
@@ -80,6 +90,7 @@ class Client {
   bool first_do_transaction;
   double current_time_;
   double current_timestamp_;
+  FILE *latency_fp_;
   
 };
 
@@ -92,7 +103,7 @@ inline bool Client::DoInsert() {
 
 inline bool Client::DoTransaction(int ops[],double durations[]) {
   int status = -1;
-  
+  unsigned long long latency;
   if(!first_do_transaction){
 	timer_.Start();
 	first_do_transaction = true;
@@ -112,7 +123,11 @@ inline bool Client::DoTransaction(int ops[],double durations[]) {
   switch (operations) {
     case READ:
       status = TransactionRead();
-      durations[READ] += (transaction_timer.elapsed());
+      latency = transaction_timer.elapsed();
+      durations[READ] += latency;
+      if(latency_fp_  != NULL){
+	fprintf(latency_fp_,"%llu,",latency);
+      }
       ops[READ]++;
       break;
     case UPDATE:

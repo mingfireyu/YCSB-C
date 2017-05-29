@@ -81,6 +81,13 @@ const string CoreWorkload::WITH_OPERATION_PROPERTY_DEFAULT = "false";
 
 const std::string CoreWorkload::TIMESTAMP_TRACEFILENAME_PROPERTY = "timestamptracefilename";
 const std::string CoreWorkload::TIMESTAMP_TRACEFILENAME_PROPERTY_DEFAULT = "trace.txt";
+
+const string CoreWorkload::WITH_LATENCY_PROPERTY = "withlatency";
+const string CoreWorkload::WITH_LATENCY_PROPERTY_DEFAULT = "false";
+
+const std::string CoreWorkload::LATENCYFILENAME_PROPERTY = "latencyfilename";
+const std::string CoreWorkload::LATENCYFILENAME_PROPERTY_DEFAULT = "lf.txt";
+
 void CoreWorkload::Init(const utils::Properties &p) {
   table_name_ = p.GetProperty(TABLENAME_PROPERTY,TABLENAME_DEFAULT);
   
@@ -126,6 +133,18 @@ void CoreWorkload::Init(const utils::Properties &p) {
   }else{
 	timestamp_trace_fp_  = NULL;
   }
+  
+  with_latency_filename_ = utils::StrToBool(p.GetProperty(WITH_LATENCY_PROPERTY,
+							  WITH_LATENCY_PROPERTY_DEFAULT));
+  
+  if(with_latency_filename_){
+       latency_fp_ = fopen(p.GetProperty(LATENCYFILENAME_PROPERTY,
+					 LATENCYFILENAME_PROPERTY_DEFAULT).c_str(),"w");
+   }else{
+       latency_fp_ = NULL;
+  }
+  
+ 
   if (p.GetProperty(INSERT_ORDER_PROPERTY, INSERT_ORDER_DEFAULT) == "hashed") {
     ordered_inserts_ = false;
   } else {

@@ -144,6 +144,12 @@ class CoreWorkload {
   static const std::string TIMESTAMP_TRACEFILENAME_PROPERTY;
   static const std::string TIMESTAMP_TRACEFILENAME_PROPERTY_DEFAULT;
   
+  static const std::string WITH_LATENCY_PROPERTY;
+  static const std::string WITH_LATENCY_PROPERTY_DEFAULT;
+  
+  static const std::string LATENCYFILENAME_PROPERTY ;
+  static const std::string LATENCYFILENAME_PROPERTY_DEFAULT;
+  
   ///
   /// Initialize the scenario.
   /// Called once, in the main client thread, before any operations are started.
@@ -199,7 +205,9 @@ class CoreWorkload {
 public:
   bool with_timestamp_;
   bool with_operation_; //operation come from trace;
+  bool with_latency_filename_;
   FILE *timestamp_trace_fp_;
+  FILE *latency_fp_;
 };
 
 inline std::string CoreWorkload::NextSequenceKey() {
