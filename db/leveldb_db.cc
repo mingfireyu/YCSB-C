@@ -1,6 +1,7 @@
 #include "leveldb_db.h"
 #include <cstring>
 #include"basic_config.hh"
+#include<iostream>
 using namespace std;
 
 namespace ycsbc {
@@ -26,6 +27,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
 	bloom_bits = LevelDB_ConfigMod::getInstance().getBloom_bits();
     }
     
+    printf("bloom_bits from config:%d\n",bloom_bits);
     options.create_if_missing = true;
     options.compression = compression_Open?leveldb::kSnappyCompression:leveldb::kNoCompression;  //compression is disabled.
     options.max_file_size = max_File_sizes;
@@ -72,7 +74,8 @@ int LevelDB::Insert(const string& table, const string& key, vector< DB::KVPair >
 	s = db_->Put(leveldb::WriteOptions(), key, p.second);
 	count++;
 	if(!s.ok()){
-	   fprintf(stderr,"insert error\n");
+	   fprintf(stderr,"insert error!\n");
+	   cout<<s.ToString()<<endl;
 	   exit(0);
 	}
     }

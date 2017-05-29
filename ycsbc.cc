@@ -30,6 +30,7 @@ int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
   double durations[] = {0,0};
   ycsbc::Client client(*db, *wl);
   int oks = 0;
+  std::string out_string;
   for (int i = 0; i < num_ops; ++i) {
     if (is_loading) {
       oks += client.DoInsert();
@@ -40,12 +41,12 @@ int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
       cerr<<"operation count:"<<i<<"\r";
     }
   }
-  cerr<<endl;
+  cout<<endl;
   if(!is_loading){
-    cerr<<"WRITE latency"<<endl;
-    cerr<<durations[ycsbc::Operation::INSERT]/ops[ycsbc::Operation::INSERT]<<"us"<<"Write ops:"<<ops[ycsbc::Operation::INSERT]<<endl;
-    cerr<<"READ latency"<<endl;
-    cerr<<durations[ycsbc::Operation::READ]/ops[ycsbc::Operation::READ]<<"us"<<"Read ops:"<<ops[ycsbc::Operation::READ]<<endl;;
+    cout<<"WRITE latency"<<endl;
+    cout<<durations[ycsbc::Operation::INSERT]/ops[ycsbc::Operation::INSERT]<<"us"<<"Write ops:"<<ops[ycsbc::Operation::INSERT]<<endl;
+    cout<<"READ latency"<<endl;
+    cout<<durations[ycsbc::Operation::READ]/ops[ycsbc::Operation::READ]<<"us"<<"Read ops:"<<ops[ycsbc::Operation::READ]<<endl;;
   }
   db->Close();
   return oks;
