@@ -27,7 +27,7 @@ bool end_flag_ = false;
 int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
     bool is_loading) {
   db->Init();
-  int ops[2] = {0,0};
+  int ops[3] = {0,0,0};
   double durations[] = {0,0};
   ycsbc::Client client(*db, *wl);
   int oks = 0;
@@ -47,7 +47,8 @@ int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
     cout<<"WRITE latency"<<endl;
     cout<<durations[ycsbc::Operation::INSERT]/ops[ycsbc::Operation::INSERT]<<"us"<<"Write ops:"<<ops[ycsbc::Operation::INSERT]<<endl;
     cout<<"READ latency"<<endl;
-    cout<<durations[ycsbc::Operation::READ]/ops[ycsbc::Operation::READ]<<"us"<<"Read ops:"<<ops[ycsbc::Operation::READ]<<endl;;
+    cout<<durations[ycsbc::Operation::READ]/ops[ycsbc::Operation::READ]<<"us"<<"Read ops:"<<ops[ycsbc::Operation::READ]<<endl;
+     cout<<"Not found num: "<<ops[2]<<endl;
   }
   end_flag_ = true;
   db->Close();
