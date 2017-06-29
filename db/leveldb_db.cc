@@ -54,8 +54,8 @@ int LevelDB::Read(const string& table, const string& key, const vector< string >
      std::string value;
     leveldb::Status s = db_->Get(leveldb::ReadOptions(), key, &value);
     if(s.IsNotFound()){
-	 fprintf(stderr,"not found!\n");
-	return DB::kOK;
+	// fprintf(stderr,"not found!\n");
+	return DB::kErrorNoData;
     }
     if(!s.ok()){
 	 fprintf(stderr,"read error\n");

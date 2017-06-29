@@ -89,8 +89,10 @@ class Client {
 	if(wl.with_latency_filename_){
 	    printf("output latency to filename :%s \n",wl.LATENCYFILENAME_PROPERTY.c_str());
 	    latency_fp_ = wl.latency_fp_;
+	    nlatency_fp_ = fopen("nlf.txt","w");
 	}else{
 	    latency_fp_ = NULL;
+	    nlatency_fp_ = NULL;
 	}
 	line_ = NULL;
 	first_do_transaction = false;
@@ -102,6 +104,7 @@ class Client {
   virtual ~Client() { 
       if(latency_fp_){
 	fflush(latency_fp_);
+	fflush(nlatency_fp_);
       }
  }
   
@@ -123,7 +126,7 @@ class Client {
   double current_time_;
   double current_timestamp_;
   FILE *latency_fp_;
-  
+  FILE *nlatency_fp_;
 };
 
 inline bool Client::DoInsert() {
@@ -160,7 +163,11 @@ inline bool Client::DoTransaction(int ops[],double durations[]) {
       latency = transaction_timer.elapsed();
       durations[READ] += latency;
       if(latency_fp_  != NULL){
-	fprintf(latency_fp_,"%llu,",latency);
+	  if(status == DB::kOK){
+	    fprintf(latency_fp_,"%llu,",latency);
+	  }else if(status == DB::kErrorNoData){
+	     fprintf(nlatency_fp_,"%llu,",latency);
+	  }
       }
       ops[READ]++;
       break;
