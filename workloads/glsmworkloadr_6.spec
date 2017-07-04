@@ -26,3 +26,4 @@ withoperation=false
 
 withlatency=true
 latencyfilename=testlf.txt
+skipratioinload=2
