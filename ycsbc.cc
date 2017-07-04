@@ -30,8 +30,12 @@ int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
   double durations[] = {0,0};
   ycsbc::Client client(*db, *wl);
   int oks = 0;
+  int skipratio_inload = wl->skipratio_inload;
   for (int i = 0; i < num_ops; ++i) {
     if (is_loading) {
+      if(skipratio_inload&&i%skipratio_inload!=0){
+	continue;
+      }
       oks += client.DoInsert();
     } else {
       oks += client.DoTransaction(ops,durations);

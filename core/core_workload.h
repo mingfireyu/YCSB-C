@@ -144,6 +144,9 @@ class CoreWorkload {
   static const std::string TIMESTAMP_TRACEFILENAME_PROPERTY;
   static const std::string TIMESTAMP_TRACEFILENAME_PROPERTY_DEFAULT;
   
+  
+  static const std::string SKIPRATIO_INLOAD_PROPERTY;
+  static const std::string SKIPRATIO_INLOAD_PROPERTY_DEFAULT; 
   ///
   /// Initialize the scenario.
   /// Called once, in the main client thread, before any operations are started.
@@ -200,6 +203,7 @@ public:
   bool with_timestamp_;
   bool with_operation_; //operation come from trace;
   FILE *timestamp_trace_fp_;
+  int skipratio_inload;
 };
 
 inline std::string CoreWorkload::NextSequenceKey() {
