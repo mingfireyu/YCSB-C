@@ -87,7 +87,8 @@ const string CoreWorkload::WITH_LATENCY_PROPERTY_DEFAULT = "false";
 
 const std::string CoreWorkload::LATENCYFILENAME_PROPERTY = "latencyfilename";
 const std::string CoreWorkload::LATENCYFILENAME_PROPERTY_DEFAULT = "lf.txt";
-
+const std::string CoreWorkload::SKIPRATIO_INLOAD_PROPERTY="skipratioinload";
+const std::string CoreWorkload::SKIPRATIO_INLOAD_PROPERTY_DEFAULT="0"; 
 void CoreWorkload::Init(const utils::Properties &p) {
   table_name_ = p.GetProperty(TABLENAME_PROPERTY,TABLENAME_DEFAULT);
   
@@ -144,7 +145,8 @@ void CoreWorkload::Init(const utils::Properties &p) {
        latency_fp_ = NULL;
   }
   
- 
+  skipratio_inload = std::stoi(p.GetProperty(SKIPRATIO_INLOAD_PROPERTY,
+                                SKIPRATIO_INLOAD_PROPERTY_DEFAULT));
   if (p.GetProperty(INSERT_ORDER_PROPERTY, INSERT_ORDER_DEFAULT) == "hashed") {
     ordered_inserts_ = false;
   } else {
