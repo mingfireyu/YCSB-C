@@ -52,6 +52,7 @@ private:
     bool _open_log;
     int _max_file_size;
     bool _compression_flag;
+    bool _directIO_flag;
 public:
     std::string getBloom_filename();
     int getMax_open_files();
@@ -61,6 +62,7 @@ public:
     int getMax_file_size();
     void setConfigPath(const char*key);
     bool getCompression_flag();
+    bool getDirectIOFlag();
 };
 
 #endif

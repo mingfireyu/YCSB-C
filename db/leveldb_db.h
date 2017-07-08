@@ -5,6 +5,7 @@
 #include <string>
 #include "core/properties.h"
 #include <leveldb/db.h>
+#include <leveldb/env.h>
 #include<leveldb/filter_policy.h>
 using std::cout;
 using std::endl;

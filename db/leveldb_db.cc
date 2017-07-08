@@ -18,6 +18,8 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     bool log_open = LevelDB_ConfigMod::getInstance().getOpen_log();
     options.log_open = log_open;
     bool compression_Open = LevelDB_ConfigMod::getInstance().getCompression_flag();
+    bool directIO_flag = LevelDB_ConfigMod::getInstance().getDirectIOFlag();
+    //    leveldb::setDirectIOFlag(directIO_flag);
     if(hierarchical_bloom_flag){
 	bloom_filename = LevelDB_ConfigMod::getInstance().getBloom_filename();
 	bloom_filename_char = (char *)malloc(sizeof(char)*bloom_filename.size()+1);
@@ -42,6 +44,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
 	void *bloom_bits_ptr = (void *)(&bloom_bits);
 	options.filter_policy = leveldb::NewBloomFilterPolicy(bloom_bits_ptr);
     }
+    leveldb::setDirectIOFlag(directIO_flag);
     leveldb::Status status = leveldb::DB::Open(options,dbfilename, &db_);
     if(!status.ok()){
 	fprintf(stderr,"can't open leveldb\n");
@@ -51,7 +54,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
 
 int LevelDB::Read(const string& table, const string& key, const vector< string >* fields, vector< DB::KVPair >& result)
 {
-     std::string value;
+    std::string value;
     leveldb::Status s = db_->Get(leveldb::ReadOptions(), key, &value);
     if(s.IsNotFound()){
 	// fprintf(stderr,"not found!\n");
