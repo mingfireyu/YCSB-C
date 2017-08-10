@@ -53,6 +53,7 @@ private:
     int _max_file_size;
     bool _compression_flag;
     bool _directIO_flag;
+    bool _seek_compaction_flag;
 public:
     std::string getBloom_filename();
     int getMax_open_files();
@@ -63,6 +64,7 @@ public:
     void setConfigPath(const char*key);
     bool getCompression_flag();
     bool getDirectIOFlag();
+    bool getSeekCompactionFlag();
 };
 
 #endif

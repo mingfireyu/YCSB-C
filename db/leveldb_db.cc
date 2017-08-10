@@ -15,10 +15,13 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     int max_open_files = LevelDB_ConfigMod::getInstance().getMax_open_files();
     int max_File_sizes = LevelDB_ConfigMod::getInstance().getMax_file_size();
     bool hierarchical_bloom_flag = LevelDB_ConfigMod::getInstance().getHierarchical_bloom_flag();
-    bool log_open = LevelDB_ConfigMod::getInstance().getOpen_log();
-    options.log_open = log_open;
+    bool seek_compaction_flag = LevelDB_ConfigMod::getInstance().getSeekCompactionFlag();
+    /*bool log_open = LevelDB_ConfigMod::getInstance().getOpen_log();
+    if(!log_open){
+      options.log_open = log_open;
+    }*/
     bool compression_Open = LevelDB_ConfigMod::getInstance().getCompression_flag();
-    bool directIO_flag = LevelDB_ConfigMod::getInstance().getDirectIOFlag();
+    //    bool directIO_flag = LevelDB_ConfigMod::getInstance().getDirectIOFlag();
     //    leveldb::setDirectIOFlag(directIO_flag);
     if(hierarchical_bloom_flag){
 	bloom_filename = LevelDB_ConfigMod::getInstance().getBloom_filename();
@@ -34,17 +37,15 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     options.compression = compression_Open?leveldb::kSnappyCompression:leveldb::kNoCompression;  //compression is disabled.
     options.max_file_size = max_File_sizes;
     options.max_open_files = max_open_files;
-    /*if(!log_open){
-	
-    }*/
+    options.opEp_.seek_compaction_ = seek_compaction_flag;
     if(hierarchical_bloom_flag){
 	void *bloom_filename_ptr = (void *)bloom_filename_char;
-	options.filter_policy = leveldb::NewBloomFilterPolicy(bloom_filename_ptr);
+	options.filter_policy = leveldb::NewBloomFilterPolicy((int)bloom_filename_ptr);
     }else{
-	void *bloom_bits_ptr = (void *)(&bloom_bits);
-	options.filter_policy = leveldb::NewBloomFilterPolicy(bloom_bits_ptr);
+	//void *bloom_bits_ptr = (void *)(&bloom_bits);
+	options.filter_policy = leveldb::NewBloomFilterPolicy(bloom_bits);
     }
-    leveldb::setDirectIOFlag(directIO_flag);
+   // leveldb::setDirectIOFlag(directIO_flag);
     leveldb::Status status = leveldb::DB::Open(options,dbfilename, &db_);
     if(!status.ok()){
 	fprintf(stderr,"can't open leveldb\n");
