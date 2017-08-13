@@ -114,6 +114,13 @@ void LevelDB::Close()
     cout<<stat_str<<endl;
 }
 
+void LevelDB::openStatistics(){
+    std::string stat_str;
+    db_->GetProperty("leveldb.stats",&stat_str);
+    cout<<"--------------------------- Before Do Transaction -----------------------------------------"<<endl;
+    cout<<stat_str<<endl;
+    cout<<"----------------------------Transaction Output------------------"<<endl;
+}
 
 LevelDB::~LevelDB()
 {
