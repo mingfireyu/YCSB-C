@@ -30,10 +30,12 @@ public :
 
   int Delete(const std::string &table, const std::string &key);
   void openStatistics();
+  void printAccessFreq();
   virtual ~LevelDB();
   void Close();
 private:
     leveldb::DB *db_;
+    static bool hasRead;
 };
 }
 #endif

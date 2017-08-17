@@ -2,6 +2,10 @@
 #include <cstring>
 #include"basic_config.hh"
 #include<iostream>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 using namespace std;
 
 namespace ycsbc {
@@ -58,7 +62,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
 	exit(0);
     }
 }
-
+bool  LevelDB::hasRead = false;
 int LevelDB::Read(const string& table, const string& key, const vector< string >* fields, vector< DB::KVPair >& result)
 {
     std::string value;
@@ -72,6 +76,7 @@ int LevelDB::Read(const string& table, const string& key, const vector< string >
 	 fprintf(stderr,"read error\n");
 	 exit(0);
     }
+    hasRead = true;
     return DB::kOK;
 }
 
@@ -118,8 +123,37 @@ void LevelDB::Close()
 {
     std::string stat_str;
     db_->GetProperty("leveldb.stats",&stat_str);
+    if(hasRead){
+	printAccessFreq();
+    }
     cout<<stat_str<<endl;
 }
+
+void LevelDB::printAccessFreq()
+{
+    int fd[7],i;
+    int levels = 0;
+    std::string num_files_str;
+    while(db_->GetProperty("leveldb.num-files-at-level",&num_files_str) && std::stoi(num_files_str)!=0 ){
+	levels++;
+    }
+    char buf[100];
+    std::string acc_str;
+    for(i = 0 ; i <= levels ; i++){
+	    snprintf(buf,sizeof(buf),"level%d_access_frequencies.txt",i);
+	    fd[i] = open(buf,O_RDWR|O_CREAT);
+	    if(fd[i] < 0){
+		perror("open :");
+	    }
+	    snprintf(buf,sizeof(buf),"leveldb.files-access-frequencies%d",i);
+	    db_->GetProperty(buf,&acc_str);
+	    if(write(fd[i],acc_str.c_str(),acc_str.size()) != (ssize_t)acc_str.size()){
+		perror("write :");
+	    }
+	    close(fd[i]);
+    }
+}
+
 
 void LevelDB::openStatistics(){
     std::string stat_str;
