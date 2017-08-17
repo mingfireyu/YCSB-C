@@ -21,8 +21,8 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
       options.log_open = log_open;
     }*/
     bool compression_Open = LevelDB_ConfigMod::getInstance().getCompression_flag();
-    //    bool directIO_flag = LevelDB_ConfigMod::getInstance().getDirectIOFlag();
-    //    leveldb::setDirectIOFlag(directIO_flag);
+    bool directIO_flag = LevelDB_ConfigMod::getInstance().getDirectIOFlag();
+    leveldb::setDirectIOFlag(directIO_flag);
     if(hierarchical_bloom_flag){
 	bloom_filename = LevelDB_ConfigMod::getInstance().getBloom_filename();
 	bloom_filename_char = (char *)malloc(sizeof(char)*bloom_filename.size()+1);
@@ -38,9 +38,15 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     options.max_file_size = max_File_sizes;
     options.max_open_files = max_open_files;
     options.opEp_.seek_compaction_ = seek_compaction_flag;
+    cout<<"seek compaction flag:";
+    if(seek_compaction_flag){
+      cout<<"true"<<endl;
+    }else{
+      cout<<"false"<<endl;
+    }
     if(hierarchical_bloom_flag){
 	void *bloom_filename_ptr = (void *)bloom_filename_char;
-	options.filter_policy = leveldb::NewBloomFilterPolicy((int)bloom_filename_ptr);
+	options.filter_policy = leveldb::NewBloomFilterPolicy(reinterpret_cast<int>(bloom_filename_ptr));
     }else{
 	//void *bloom_bits_ptr = (void *)(&bloom_bits);
 	options.filter_policy = leveldb::NewBloomFilterPolicy(bloom_bits);
@@ -62,6 +68,7 @@ int LevelDB::Read(const string& table, const string& key, const vector< string >
 	return DB::kErrorNoData;
     }
     if(!s.ok()){
+         cerr<<s.ToString()<<endl;
 	 fprintf(stderr,"read error\n");
 	 exit(0);
     }

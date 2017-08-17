@@ -29,7 +29,8 @@ public :
              std::vector<KVPair> &values) ;
 
   int Delete(const std::string &table, const std::string &key);
-   virtual ~LevelDB();
+  void openStatistics();
+  virtual ~LevelDB();
   void Close();
 private:
     leveldb::DB *db_;

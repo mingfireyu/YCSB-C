@@ -27,7 +27,7 @@ void LevelDB_ConfigMod::setConfigPath(const char*path){
     std::cout<<"_bloom_bits_"<<_bloom_bits<<std::endl;
     _max_file_size = readInt("basic.maxFilesize");
     _max_open_files = readInt("basic.maxOpenfiles");
-    _hierarchical_bloom_flag = readBool("basic.hierarchicalBoomflag");
+    _hierarchical_bloom_flag = readBool("basic.hierarchicalBloomflag");
     _open_log = readBool("basic.openLog");
     _compression_flag = readBool("basic.compressionFlag");
     _directIO_flag = readBool("basic.directIOFlag");
