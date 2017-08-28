@@ -32,6 +32,7 @@ public :
   void openStatistics();
   void printAccessFreq();
   virtual ~LevelDB();
+  virtual void doSomeThing();
   void Close();
 private:
     leveldb::DB *db_;

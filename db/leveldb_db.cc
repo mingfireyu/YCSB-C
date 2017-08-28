@@ -161,6 +161,10 @@ void LevelDB::printAccessFreq()
     }
 }
 
+void LevelDB::doSomeThing()
+{
+    db_->DoSomeThing((void*)"adjust_filter");
+}
 
 void LevelDB::openStatistics(){
     std::string stat_str;

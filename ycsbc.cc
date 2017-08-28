@@ -64,6 +64,8 @@ int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
       end_flag_ = true;
       ycsbc::CoreWorkload nwl;
       nwl.Init(*props_ptr);
+      cout<<"Adjust bloom filter accroding to access frequencies"<<endl;
+      db->doSomeThing();
       return DelegateClient(db,&nwl,num_ops,is_loading);
     }
   }
