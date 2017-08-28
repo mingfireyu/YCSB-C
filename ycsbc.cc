@@ -17,16 +17,19 @@
 #include "core/core_workload.h"
 #include "db/db_factory.h"
 #include<boost/timer.hpp>
+#include<memory>
 using namespace std;
 
 void UsageMessage(const char *command);
 bool StrStartWith(const char *str, const char *pre);
 string ParseCommandLine(int argc, const char *argv[], utils::Properties &props);
 bool end_flag_ = false;
-
+shared_ptr<utils::Properties> props_ptr = nullptr;
 int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
     bool is_loading) {
-  db->Init();
+  if(!end_flag_){
+    db->Init();
+  }
   int ops[3] = {0,0,0};
   double durations[] = {0,0};
   ycsbc::Client client(*db, *wl);
@@ -43,7 +46,11 @@ int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
       oks += client.DoTransaction(ops,durations);
     }
     if(i%10000 == 0){
-      cerr<<"operation count:"<<i<<"\r";
+      if(is_loading && i%100000 == 0){
+	cerr<<"operation count:"<<i<<"\r";
+      }else if(!is_loading){
+	cerr<<"operation count:"<<i<<"\r";
+      }
     }
   }
   cout<<endl;
@@ -52,7 +59,13 @@ int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
     cout<<durations[ycsbc::Operation::INSERT]/ops[ycsbc::Operation::INSERT]<<"us"<<"Write ops:"<<ops[ycsbc::Operation::INSERT]<<endl;
     cout<<"READ latency"<<endl;
     cout<<durations[ycsbc::Operation::READ]/ops[ycsbc::Operation::READ]<<"us"<<"Read ops:"<<ops[ycsbc::Operation::READ]<<endl;
-     cout<<"Not found num: "<<ops[2]<<endl;
+    cout<<"Not found num: "<<ops[2]<<endl;
+    if(wl->adjust_filter_&&!end_flag_){
+      end_flag_ = true;
+      ycsbc::CoreWorkload nwl;
+      nwl.Init(*props_ptr);
+      return DelegateClient(db,&nwl,num_ops,is_loading);
+    }
   }
   end_flag_ = true;
   db->Close();
@@ -71,7 +84,7 @@ int main(const int argc, const char *argv[]) {
 
   ycsbc::CoreWorkload wl;
   wl.Init(props);
-
+  props_ptr.reset(&props);
   const int num_threads = stoi(props.GetProperty("threadcount", "1"));
   bool skipLoad = utils::StrToBool(props.GetProperty("skipLoad",
 						   "false"));

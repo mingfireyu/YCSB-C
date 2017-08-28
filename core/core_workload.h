@@ -151,6 +151,9 @@ class CoreWorkload {
   static const std::string LATENCYFILENAME_PROPERTY_DEFAULT;
   static const std::string SKIPRATIO_INLOAD_PROPERTY;
   static const std::string SKIPRATIO_INLOAD_PROPERTY_DEFAULT; 
+  static const std::string ADJUST_FILTER_PROPERTY;
+  static const std::string ADJUST_FILTER_PROPERTY_DEFAULT;
+  static int initCount;
   ///
   /// Initialize the scenario.
   /// Called once, in the main client thread, before any operations are started.
@@ -210,7 +213,7 @@ public:
   FILE *timestamp_trace_fp_;
   FILE *latency_fp_;
   int skipratio_inload;
-
+  bool adjust_filter_;
 };
 
 inline std::string CoreWorkload::NextSequenceKey() {

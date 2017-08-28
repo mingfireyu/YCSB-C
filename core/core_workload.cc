@@ -86,10 +86,16 @@ const string CoreWorkload::WITH_LATENCY_PROPERTY = "withlatency";
 const string CoreWorkload::WITH_LATENCY_PROPERTY_DEFAULT = "false";
 
 const std::string CoreWorkload::LATENCYFILENAME_PROPERTY = "latencyfilename";
-const std::string CoreWorkload::LATENCYFILENAME_PROPERTY_DEFAULT = "lf.txt";
-const std::string CoreWorkload::SKIPRATIO_INLOAD_PROPERTY="skipratioinload";
-const std::string CoreWorkload::SKIPRATIO_INLOAD_PROPERTY_DEFAULT="0"; 
+const std::string CoreWorkload::LATENCYFILENAME_PROPERTY_DEFAULT = "lf";
+const std::string CoreWorkload::SKIPRATIO_INLOAD_PROPERTY ="skipratioinload";
+const std::string CoreWorkload::SKIPRATIO_INLOAD_PROPERTY_DEFAULT = "0"; 
+const std::string CoreWorkload::ADJUST_FILTER_PROPERTY = "adjustfilter";
+const std::string CoreWorkload::ADJUST_FILTER_PROPERTY_DEFAULT = "false";
+
+int CoreWorkload::initCount = 0;
+
 void CoreWorkload::Init(const utils::Properties &p) {
+  initCount++;
   table_name_ = p.GetProperty(TABLENAME_PROPERTY,TABLENAME_DEFAULT);
   
   field_count_ = std::stoi(p.GetProperty(FIELD_COUNT_PROPERTY,
@@ -131,6 +137,9 @@ void CoreWorkload::Init(const utils::Properties &p) {
   if(with_timestamp_){
 	timestamp_trace_fp_ = fopen(p.GetProperty(TIMESTAMP_TRACEFILENAME_PROPERTY,
 						TIMESTAMP_TRACEFILENAME_PROPERTY_DEFAULT).c_str(),"r");
+	if(timestamp_trace_fp_ == NULL){
+	  perror("open time_stamp trace fp error:");
+	}
   }else{
 	timestamp_trace_fp_  = NULL;
   }
@@ -139,14 +148,21 @@ void CoreWorkload::Init(const utils::Properties &p) {
 							  WITH_LATENCY_PROPERTY_DEFAULT));
   
   if(with_latency_filename_){
-       latency_fp_ = fopen(p.GetProperty(LATENCYFILENAME_PROPERTY,
-					 LATENCYFILENAME_PROPERTY_DEFAULT).c_str(),"w");
+       string latency_filename_str = p.GetProperty(LATENCYFILENAME_PROPERTY,
+						   LATENCYFILENAME_PROPERTY_DEFAULT);
+       latency_filename_str = latency_filename_str + std::to_string(initCount) + ".txt";
+       latency_fp_ = fopen(latency_filename_str.c_str(),"w");
+       if(latency_fp_ == NULL){
+	 perror("open latency filename error:");
+       }
    }else{
        latency_fp_ = NULL;
   }
   
   skipratio_inload = std::stoi(p.GetProperty(SKIPRATIO_INLOAD_PROPERTY,
                                 SKIPRATIO_INLOAD_PROPERTY_DEFAULT));
+  adjust_filter_ = utils::StrToBool(p.GetProperty(ADJUST_FILTER_PROPERTY,
+						  ADJUST_FILTER_PROPERTY_DEFAULT));
   if (p.GetProperty(INSERT_ORDER_PROPERTY, INSERT_ORDER_DEFAULT) == "hashed") {
     ordered_inserts_ = false;
   } else {

@@ -89,7 +89,11 @@ class Client {
 	if(wl.with_latency_filename_){
 	    printf("output latency to filename :%s \n",wl.LATENCYFILENAME_PROPERTY.c_str());
 	    latency_fp_ = wl.latency_fp_;
-	    nlatency_fp_ = fopen("nlf.txt","w");
+	    std::string nlf_filename_str = "nlf" + std::to_string(wl.initCount) + ".txt"; 	    
+	    nlatency_fp_ = fopen(nlf_filename_str.c_str(),"w");
+	    if(nlatency_fp_ == NULL){
+	      perror("client init:");
+	    }
 	}else{
 	    latency_fp_ = NULL;
 	    nlatency_fp_ = NULL;
@@ -143,7 +147,7 @@ inline bool Client::DoTransaction(int ops[],double durations[]) {
   if(!first_do_transaction){
 	timer_.Start();
 	first_do_transaction = true;	
-	__init_file(ops);
+	//	__init_file(ops);
   }
   if(timestamp_trace_fp_){
 	 current_time_ = timer_.elapsed();

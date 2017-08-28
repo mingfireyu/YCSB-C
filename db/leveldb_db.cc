@@ -26,7 +26,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     }*/
     bool compression_Open = LevelDB_ConfigMod::getInstance().getCompression_flag();
     bool directIO_flag = LevelDB_ConfigMod::getInstance().getDirectIOFlag();
-    leveldb::setDirectIOFlag(directIO_flag);
+    //    leveldb::setDirectIOFlag(directIO_flag);
     if(hierarchical_bloom_flag){
 	bloom_filename = LevelDB_ConfigMod::getInstance().getBloom_filename();
 	bloom_filename_char = (char *)malloc(sizeof(char)*bloom_filename.size()+1);
@@ -42,6 +42,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     options.max_file_size = max_File_sizes;
     options.max_open_files = max_open_files;
     options.opEp_.seek_compaction_ = seek_compaction_flag;
+    //    options.paranoid_checks = true;
     cout<<"seek compaction flag:";
     if(seek_compaction_flag){
       cout<<"true"<<endl;
@@ -50,10 +51,11 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     }
     if(hierarchical_bloom_flag){
 	void *bloom_filename_ptr = (void *)bloom_filename_char;
-	options.filter_policy = leveldb::NewBloomFilterPolicy(reinterpret_cast<int>(bloom_filename_ptr));
+	//	options.filter_policy = leveldb::NewBloomFilterPolicy(reinterpret_cast<int>(bloom_filename_ptr));
     }else{
 	//void *bloom_bits_ptr = (void *)(&bloom_bits);
-	options.filter_policy = leveldb::NewBloomFilterPolicy(bloom_bits);
+      int bits_per_key_per_filter[] = {4,4,4,4,4,4,4,4,0};
+      options.filter_policy = leveldb::NewBloomFilterPolicy(bits_per_key_per_filter,bloom_bits);
     }
    // leveldb::setDirectIOFlag(directIO_flag);
     leveldb::Status status = leveldb::DB::Open(options,dbfilename, &db_);
@@ -123,9 +125,11 @@ void LevelDB::Close()
 {
     std::string stat_str;
     db_->GetProperty("leveldb.stats",&stat_str);
-    if(hasRead){
-	printAccessFreq();
-    }
+    // cerr<<"close is called"<<endl;
+    // cerr<<"hasRead value: "<<hasRead<<endl;
+    // if(hasRead){
+    // 	printAccessFreq();
+    // }
     cout<<stat_str<<endl;
 }
 
@@ -133,11 +137,14 @@ void LevelDB::printAccessFreq()
 {
     int fd[7],i;
     int levels = 0;
-    std::string num_files_str;
-    while(db_->GetProperty("leveldb.num-files-at-level",&num_files_str) && std::stoi(num_files_str)!=0 ){
-	levels++;
-    }
     char buf[100];
+    std::string num_files_str;
+    snprintf(buf,sizeof(buf),"leveldb.num-files-at-level%d",levels);
+    while(db_->GetProperty(buf,&num_files_str) && std::stoi(num_files_str)!=0 ){
+	levels++;
+	snprintf(buf,sizeof(buf),"leveldb.num-files-at-level%d",levels);
+    }
+
     std::string acc_str;
     for(i = 0 ; i <= levels ; i++){
 	    snprintf(buf,sizeof(buf),"level%d_access_frequencies.txt",i);
