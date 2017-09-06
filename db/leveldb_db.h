@@ -32,11 +32,12 @@ public :
   void openStatistics();
   void printAccessFreq();
   virtual ~LevelDB();
-  virtual void doSomeThing();
+  virtual void doSomeThing(const char *thing_str="adjust_filter");
   void Close();
 private:
     leveldb::DB *db_;
     static bool hasRead;
+    void printFilterCount();
 };
 }
 #endif

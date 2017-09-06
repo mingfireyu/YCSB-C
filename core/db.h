@@ -90,7 +90,7 @@ class DB {
   ///
   virtual int Delete(const std::string &table, const std::string &key) = 0;
   virtual void openStatistics() {}
-  virtual void doSomeThing() {}
+  virtual void doSomeThing(const char *thing_str="adjust_filter") {}
   virtual ~DB() { }
 };
 

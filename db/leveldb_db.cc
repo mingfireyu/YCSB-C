@@ -54,7 +54,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
 	//	options.filter_policy = leveldb::NewBloomFilterPolicy(reinterpret_cast<int>(bloom_filename_ptr));
     }else{
 	//void *bloom_bits_ptr = (void *)(&bloom_bits);
-      int bits_per_key_per_filter[] = {4,4,4,4,4,4,4,4,0};
+      int bits_per_key_per_filter[] = {8,4,4,4,4,4,4,0};
       options.filter_policy = leveldb::NewBloomFilterPolicy(bits_per_key_per_filter,bloom_bits);
     }
    // leveldb::setDirectIOFlag(directIO_flag);
@@ -161,9 +161,43 @@ void LevelDB::printAccessFreq()
     }
 }
 
-void LevelDB::doSomeThing()
+void LevelDB::printFilterCount()
 {
+    int fd[7],i;
+    int levels = 0;
+    char buf[100];
+    static int call_count = 0;
+    std::string num_files_str;
+    snprintf(buf,sizeof(buf),"leveldb.num-files-at-level%d",levels);
+    while(db_->GetProperty(buf,&num_files_str) && std::stoi(num_files_str)!=0 ){
+	levels++;
+	snprintf(buf,sizeof(buf),"leveldb.num-files-at-level%d",levels);
+    }
+
+    std::string filter_str;
+    for(i = 0 ; i < levels ; i++){
+            snprintf(buf,sizeof(buf),"level%d_filter_count_%d.txt",i,call_count);
+	    fd[i] = open(buf,O_RDWR|O_CREAT);
+	    if(fd[i] < 0){
+		perror("open :");
+	    }
+	    snprintf(buf,sizeof(buf),"leveldb.file_filter_size%d",i);
+	    db_->GetProperty(buf,&filter_str);
+	    if(write(fd[i],filter_str.c_str(),filter_str.size()) != (ssize_t)filter_str.size()){
+		perror("write :");
+	    }
+	    close(fd[i]);
+    }
+    call_count++;
+}
+
+void LevelDB::doSomeThing(const char* thing_str)
+{
+  if(strncmp(thing_str,"adjust_filter",strlen("adjust_filter")) == 0){
     db_->DoSomeThing((void*)"adjust_filter");
+  }else if(strncmp(thing_str,"printFilterCount",strlen("printFilterCount")) == 0){
+    printFilterCount();
+  }
 }
 
 void LevelDB::openStatistics(){

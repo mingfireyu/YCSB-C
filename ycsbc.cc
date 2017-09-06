@@ -24,7 +24,7 @@ void UsageMessage(const char *command);
 bool StrStartWith(const char *str, const char *pre);
 string ParseCommandLine(int argc, const char *argv[], utils::Properties &props);
 bool end_flag_ = false;
-shared_ptr<utils::Properties> props_ptr = nullptr;
+utils::Properties *props_ptr = NULL;
 int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
     bool is_loading) {
   if(!end_flag_){
@@ -60,6 +60,7 @@ int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
     cout<<"READ latency"<<endl;
     cout<<durations[ycsbc::Operation::READ]/ops[ycsbc::Operation::READ]<<"us"<<"Read ops:"<<ops[ycsbc::Operation::READ]<<endl;
     cout<<"Not found num: "<<ops[2]<<endl;
+    db->doSomeThing("printFilterCount");
     if(wl->adjust_filter_&&!end_flag_){
       end_flag_ = true;
       ycsbc::CoreWorkload nwl;
@@ -86,7 +87,7 @@ int main(const int argc, const char *argv[]) {
 
   ycsbc::CoreWorkload wl;
   wl.Init(props);
-  props_ptr.reset(&props);
+  props_ptr = &props;
   const int num_threads = stoi(props.GetProperty("threadcount", "1"));
   bool skipLoad = utils::StrToBool(props.GetProperty("skipLoad",
 						   "false"));
