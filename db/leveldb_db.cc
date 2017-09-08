@@ -140,7 +140,7 @@ void LevelDB::printAccessFreq()
     char buf[100];
     std::string num_files_str;
     snprintf(buf,sizeof(buf),"leveldb.num-files-at-level%d",levels);
-    while(db_->GetProperty(buf,&num_files_str) && std::stoi(num_files_str)!=0 ){
+    while(levels == 0 || (db_->GetProperty(buf,&num_files_str) && std::stoi(num_files_str)!=0) ){
 	levels++;
 	snprintf(buf,sizeof(buf),"leveldb.num-files-at-level%d",levels);
     }
@@ -169,7 +169,7 @@ void LevelDB::printFilterCount()
     static int call_count = 0;
     std::string num_files_str;
     snprintf(buf,sizeof(buf),"leveldb.num-files-at-level%d",levels);
-    while(db_->GetProperty(buf,&num_files_str) && std::stoi(num_files_str)!=0 ){
+    while(levels == 0 || (db_->GetProperty(buf,&num_files_str) && std::stoi(num_files_str)!=0) ){
 	levels++;
 	snprintf(buf,sizeof(buf),"leveldb.num-files-at-level%d",levels);
     }
