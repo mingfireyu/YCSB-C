@@ -5,7 +5,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
+#include <memory>
 using namespace std;
 
 namespace ycsbc {
@@ -42,6 +42,9 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     options.max_file_size = max_File_sizes;
     options.max_open_files = max_open_files;
     options.opEp_.seek_compaction_ = seek_compaction_flag;
+    if(LevelDB_ConfigMod::getInstance().getStatisticsOpen()){
+      options.opEp_.stats_ = make_shared<leveldb::Statistics>();
+    }
     //    options.paranoid_checks = true;
     cout<<"seek compaction flag:";
     if(seek_compaction_flag){

@@ -7,6 +7,7 @@
 #include <leveldb/db.h>
 #include <leveldb/env.h>
 #include<leveldb/filter_policy.h>
+#include<leveldb/statistics.h>
 using std::cout;
 using std::endl;
 

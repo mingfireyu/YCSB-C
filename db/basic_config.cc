@@ -32,6 +32,7 @@ void LevelDB_ConfigMod::setConfigPath(const char*path){
     _compression_flag = readBool("basic.compressionFlag");
     _directIO_flag = readBool("basic.directIOFlag");
     _seek_compaction_flag = readBool("basic.seekCompactionFlag");
+    _statistics_open = readBool("basic.statisticsOpen");
 }
 /*template<typename T>
 boost::shared_ptr<T> Basic_ConfigMod<T>::instance= nullptr;*/
@@ -79,6 +80,12 @@ bool LevelDB_ConfigMod::getSeekCompactionFlag()
 {
    assert(!_pt.empty());
    return _seek_compaction_flag;
+}
+
+bool LevelDB_ConfigMod::getStatisticsOpen()
+{
+   assert(!_pt.empty());
+   return _statistics_open;
 }
 
 template<>
