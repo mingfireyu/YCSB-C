@@ -24,4 +24,4 @@ withtimestamp=false
 timestamptracefilename=trace2.txt
 withoperation=false
 
-skipratioinload=2
+skipratioinload=0

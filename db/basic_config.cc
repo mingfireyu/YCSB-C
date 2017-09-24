@@ -33,6 +33,7 @@ void LevelDB_ConfigMod::setConfigPath(const char*path){
     _directIO_flag = readBool("basic.directIOFlag");
     _seek_compaction_flag = readBool("basic.seekCompactionFlag");
     _statistics_open = readBool("basic.statisticsOpen");
+    _bloom_bits_array_filename = readString("basic.bitsArrayFilename");
 }
 /*template<typename T>
 boost::shared_ptr<T> Basic_ConfigMod<T>::instance= nullptr;*/
@@ -86,6 +87,11 @@ bool LevelDB_ConfigMod::getStatisticsOpen()
 {
    assert(!_pt.empty());
    return _statistics_open;
+}
+
+std::string LevelDB_ConfigMod::getBitsArrayFilename(){
+    assert(!_pt.empty());
+    return _bloom_bits_array_filename;
 }
 
 template<>

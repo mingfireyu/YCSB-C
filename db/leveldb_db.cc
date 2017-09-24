@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <memory>
+#include <vector>
 using namespace std;
 
 namespace ycsbc {
@@ -43,7 +44,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     options.max_open_files = max_open_files;
     options.opEp_.seek_compaction_ = seek_compaction_flag;
     if(LevelDB_ConfigMod::getInstance().getStatisticsOpen()){
-      options.opEp_.stats_ = make_shared<leveldb::Statistics>();
+      options.opEp_.stats_ = leveldb::CreateDBStatistics();
     }
     //    options.paranoid_checks = true;
     cout<<"seek compaction flag:";
@@ -57,7 +58,22 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
 	//	options.filter_policy = leveldb::NewBloomFilterPolicy(reinterpret_cast<int>(bloom_filename_ptr));
     }else{
 	//void *bloom_bits_ptr = (void *)(&bloom_bits);
-      int bits_per_key_per_filter[] = {8,4,4,4,4,4,4,0};
+      int bits_per_key_per_filter[10];
+      int i = 0;
+      std::string bits_array_filename = LevelDB_ConfigMod::getInstance().getBitsArrayFilename();
+      FILE *fp = fopen(bits_array_filename.c_str(),"r");
+      char c;
+      while( (c=fgetc(fp)) != EOF){
+	if(!(c >= '0' && c <= '9')){
+	  continue;
+	}
+	bits_per_key_per_filter[i++] = c-'0';
+      }
+      fprintf(stderr,"bits_per_key_per_filter: ");
+      for(int i = 0 ; bits_per_key_per_filter[i] ; i++){
+	fprintf(stderr,"%d ",bits_per_key_per_filter[i]);
+      }
+      fprintf(stderr,"\n");
       options.filter_policy = leveldb::NewBloomFilterPolicy(bits_per_key_per_filter,bloom_bits);
     }
    // leveldb::setDirectIOFlag(directIO_flag);
@@ -126,14 +142,11 @@ int LevelDB::Update(const string& table, const string& key, vector< DB::KVPair >
 
 void LevelDB::Close()
 {
-    std::string stat_str;
-    db_->GetProperty("leveldb.stats",&stat_str);
     // cerr<<"close is called"<<endl;
     // cerr<<"hasRead value: "<<hasRead<<endl;
     // if(hasRead){
     // 	printAccessFreq();
     // }
-    cout<<stat_str<<endl;
 }
 
 void LevelDB::printAccessFreq()
@@ -200,6 +213,10 @@ void LevelDB::doSomeThing(const char* thing_str)
     db_->DoSomeThing((void*)"adjust_filter");
   }else if(strncmp(thing_str,"printFilterCount",strlen("printFilterCount")) == 0){
     printFilterCount();
+  }else if(strncmp(thing_str,"printStats",strlen("printStats")) == 0){
+    std::string stat_str;
+    db_->GetProperty("leveldb.stats",&stat_str);
+    cout<<stat_str<<endl;
   }
 }
 

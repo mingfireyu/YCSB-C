@@ -36,6 +36,8 @@ int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
   int oks = 0;
   std::string out_string;
   int skipratio_inload = wl->skipratio_inload;
+  struct timeval start_insert_time,end_insert_time,res_time;
+  gettimeofday(&start_insert_time,NULL);
   for (int i = 0; i < num_ops; ++i) {
     if (is_loading) {
       if(skipratio_inload&&i%skipratio_inload!=0){
@@ -53,6 +55,8 @@ int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
       }
     }
   }
+  gettimeofday(&end_insert_time,NULL);
+  timersub(&end_insert_time,&start_insert_time,&res_time);
   cout<<endl;
   if(!is_loading){
     cout<<"WRITE latency"<<endl;
@@ -61,6 +65,7 @@ int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
     cout<<durations[ycsbc::Operation::READ]/ops[ycsbc::Operation::READ]<<"us"<<"Read ops:"<<ops[ycsbc::Operation::READ]<<endl;
     cout<<"Not found num: "<<ops[2]<<endl;
     db->doSomeThing("printFilterCount");
+    db->doSomeThing("printStats");
     if(wl->adjust_filter_&&!end_flag_){
       end_flag_ = true;
       ycsbc::CoreWorkload nwl;
@@ -69,6 +74,9 @@ int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
       db->doSomeThing();
       return DelegateClient(db,&nwl,num_ops,is_loading);
     }
+  }else{
+    cout<<"Total time of insert: "<<res_time.tv_sec * 1000000 + res_time.tv_usec<<"us"<<endl;
+    cout<<"Per insert time: "<<(res_time.tv_sec * 1000000 + res_time.tv_usec)*1.0/num_ops<<"us"<<endl;
   }
   end_flag_ = true;
   db->Close();

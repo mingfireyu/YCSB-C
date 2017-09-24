@@ -18,12 +18,12 @@ updateproportion=0.0
 scanproportion=0
 insertproportion=0
 fieldlength=128
-requestdistribution=uniform
+requestdistribution=zipfian
 
 withtimestamp=false
 timestamptracefilename=trace2.txt
 withoperation=false
 
 withlatency=true
-latencyfilename=testlf.txt
-
+latencyfilename=testlf
+adjustfilter=true

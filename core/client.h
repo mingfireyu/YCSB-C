@@ -45,13 +45,13 @@ void *ReportInLoop(void *arg){
   return NULL;
 }
 
-static void __init_file(int *ops){
-  //f_wop = fopen(write_iops_filename,"w");
-  static pthread_t t;
-  f_ops[0] = NULL;
-  f_ops[1] = fopen(iops_filename_[1],"w");
-  pthread_create(&t,NULL, &ReportInLoop, ops);
-}
+/* static void __init_file(int *ops){ */
+/*   //f_wop = fopen(write_iops_filename,"w"); */
+/*   static pthread_t t; */
+/*   f_ops[0] = NULL; */
+/*   f_ops[1] = fopen(iops_filename_[1],"w"); */
+/*   pthread_create(&t,NULL, &ReportInLoop, ops); */
+/* } */
 
 class WallTimer{
 public:

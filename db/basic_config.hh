@@ -39,13 +39,13 @@ protected:
     unsigned long readUL(const char *key);
     std::string readString (const char* key);
     size_t readSize_t(const char* key);
-   
-   
+     
 };
 class LevelDB_ConfigMod:public Basic_ConfigMod<LevelDB_ConfigMod>{
 private:
     friend class Basic_ConfigMod<LevelDB_ConfigMod>;
     std::string _bloom_filename;
+    std::string _bloom_bits_array_filename;
     int _max_open_files;
     bool _hierarchical_bloom_flag;
     int _bloom_bits;
@@ -67,6 +67,7 @@ public:
     bool getDirectIOFlag();
     bool getSeekCompactionFlag();
     bool getStatisticsOpen();
+    std::string getBitsArrayFilename();
 };
 
 #endif
