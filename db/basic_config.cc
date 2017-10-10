@@ -18,6 +18,10 @@ std::string Basic_ConfigMod<T>::readString (const char* key) {
     return _pt.get<std::string>(key);
 }
 
+template<typename T>
+double Basic_ConfigMod<T>::readFloat(const char *key){
+    return _pt.get<double>(key);
+}
 
 void LevelDB_ConfigMod::setConfigPath(const char*path){
     boost::property_tree::ini_parser::read_ini(path, _pt);
@@ -27,13 +31,15 @@ void LevelDB_ConfigMod::setConfigPath(const char*path){
     std::cout<<"_bloom_bits_"<<_bloom_bits<<std::endl;
     _max_file_size = readInt("basic.maxFilesize");
     _max_open_files = readInt("basic.maxOpenfiles");
-    _hierarchical_bloom_flag = readBool("basic.hierarchicalBloomflag");
+    _bloom_type = readInt("basic.bloomType");
     _open_log = readBool("basic.openLog");
     _compression_flag = readBool("basic.compressionFlag");
     _directIO_flag = readBool("basic.directIOFlag");
     _seek_compaction_flag = readBool("basic.seekCompactionFlag");
     _statistics_open = readBool("basic.statisticsOpen");
     _bloom_bits_array_filename = readString("basic.bitsArrayFilename");
+    _lrus_num = readInt("basic.LRUNum");
+    _filters_capacity_ratio = readFloat("basic.FilterCapacityRatio");
 }
 /*template<typename T>
 boost::shared_ptr<T> Basic_ConfigMod<T>::instance= nullptr;*/
@@ -57,9 +63,9 @@ int LevelDB_ConfigMod::getMax_open_files(){
     return _max_open_files;
 }
 
-bool LevelDB_ConfigMod::getHierarchical_bloom_flag(){
+int LevelDB_ConfigMod::getBloomType(){
     assert(!_pt.empty());
-    return _hierarchical_bloom_flag;
+    return _bloom_type;
 }
 
 bool LevelDB_ConfigMod::getOpen_log(){
@@ -92,6 +98,18 @@ bool LevelDB_ConfigMod::getStatisticsOpen()
 std::string LevelDB_ConfigMod::getBitsArrayFilename(){
     assert(!_pt.empty());
     return _bloom_bits_array_filename;
+}
+
+int LevelDB_ConfigMod::getLRUsNum()
+{
+    assert(!_pt.empty());
+    return _lrus_num;
+}
+
+double LevelDB_ConfigMod::getFiltersCapacityRatio()
+{
+    assert(!_pt.empty());
+    return _filters_capacity_ratio;
 }
 
 template<>

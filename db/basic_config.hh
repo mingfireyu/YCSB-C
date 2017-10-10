@@ -51,14 +51,17 @@ private:
     int _bloom_bits;
     bool _open_log;
     int _max_file_size;
+    int _bloom_type;  //0 means origin bloom filter, 1 means  hierarchical bloom filter, 2 means multi_bloom_filter
     bool _compression_flag;
     bool _directIO_flag;
     bool _seek_compaction_flag;
     bool _statistics_open;
+    int _lrus_num;
+    double _filters_capacity_ratio;
 public:
     std::string getBloom_filename();
     int getMax_open_files();
-    bool getHierarchical_bloom_flag();
+    int getBloomType();
     int getBloom_bits();
     bool getOpen_log();
     int getMax_file_size();
@@ -68,6 +71,8 @@ public:
     bool getSeekCompactionFlag();
     bool getStatisticsOpen();
     std::string getBitsArrayFilename();
+    int getLRUsNum();
+    double getFiltersCapacityRatio();
 };
 
 #endif
