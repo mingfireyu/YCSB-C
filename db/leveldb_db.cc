@@ -70,8 +70,10 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
 	bits_per_key_per_filter[i++] = c-'0';
       }
       fprintf(stderr,"bits_per_key_per_filter: ");
+      fprintf(stdout,"\nbits_per_key_per_filter: ");
       for(int i = 0 ; bits_per_key_per_filter[i] ; i++){
 	fprintf(stderr,"%d ",bits_per_key_per_filter[i]);
+	fprintf(stdout,"%d ",bits_per_key_per_filter[i]);
       }
       fprintf(stderr,"\n");
       options.filter_policy = leveldb::NewBloomFilterPolicy(bits_per_key_per_filter,bloom_bits);

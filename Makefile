@@ -1,6 +1,6 @@
 CC=g++
-CFLAGS=-std=c++11  -Wall -pthread -I./ -I/home/ming/workspace/kvseparation/src
-LDFLAGS= -lpthread -ltbb -lhiredis -lVLogWB -lleveldb -lboost_system -lboost_thread
+CFLAGS=-std=c++11  -Wall -pthread -I./ 
+LDFLAGS= -lpthread -ltbb -lhiredis -lleveldb -lboost_system -lboost_thread
 SUBDIRS=core db redis
 SUBSRCS=$(wildcard core/*.cc) $(wildcard db/*.cc)
 OBJECTS=$(SUBSRCS:.cc=.o)

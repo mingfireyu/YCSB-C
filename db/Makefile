@@ -1,6 +1,6 @@
 CC=g++
 CFLAGS=-std=c++11 -c  -Wall -fgnu-tm -lleveldb
-INCLUDES=-I../  -I/home/ming/workspace/kvseparation/src
+INCLUDES=-I../  
 SOURCES=$(wildcard *.cc)
 OBJECTS=$(SOURCES:.cc=.o)
 
