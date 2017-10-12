@@ -21,6 +21,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     int max_File_sizes = LevelDB_ConfigMod::getInstance().getMax_file_size();
     int bloom_type = LevelDB_ConfigMod::getInstance().getBloomType();
     bool seek_compaction_flag = LevelDB_ConfigMod::getInstance().getSeekCompactionFlag();
+    double filter_capacity_ratio = LevelDB_ConfigMod::getInstance().getFiltersCapacityRatio();
     cout<<"seek compaction flag:";
     if(seek_compaction_flag){
       cout<<"true"<<endl;
@@ -73,12 +74,13 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     }else{
 	fprintf(stderr,"Wrong filter type!\n");
     }
-   
+    
     options.create_if_missing = true;
     options.compression = compression_Open?leveldb::kSnappyCompression:leveldb::kNoCompression;  //compression is disabled.
     options.max_file_size = max_File_sizes;
     options.max_open_files = max_open_files;
     options.opEp_.seek_compaction_ = seek_compaction_flag;
+    options.opEp_.filter_capacity_ratio = filter_capacity_ratio;
     if(LevelDB_ConfigMod::getInstance().getStatisticsOpen()){
       options.opEp_.stats_ = leveldb::CreateDBStatistics();
     }
