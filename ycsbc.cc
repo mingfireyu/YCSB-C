@@ -64,16 +64,7 @@ int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
     cout<<"READ latency"<<endl;
     cout<<durations[ycsbc::Operation::READ]/ops[ycsbc::Operation::READ]<<"us"<<"Read ops:"<<ops[ycsbc::Operation::READ]<<endl;
     cout<<"Not found num: "<<ops[2]<<endl;
-    db->doSomeThing("printFilterCount");
     db->doSomeThing("printStats");
-    if(wl->adjust_filter_&&!end_flag_){
-      end_flag_ = true;
-      ycsbc::CoreWorkload nwl;
-      nwl.Init(*props_ptr);
-      cout<<"Adjust bloom filter accroding to access frequencies"<<endl;
-      db->doSomeThing();
-      return DelegateClient(db,&nwl,num_ops,is_loading);
-    }
   }else{
     cout<<"Total time of insert: "<<res_time.tv_sec * 1000000 + res_time.tv_usec<<"us"<<endl;
     cout<<"Per insert time: "<<(res_time.tv_sec * 1000000 + res_time.tv_usec)*1.0/num_ops<<"us"<<endl;

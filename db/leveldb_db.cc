@@ -15,63 +15,28 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     leveldb::Options options;
     LevelDB_ConfigMod::getInstance().setConfigPath(configPath);
     std::string bloom_filename;
-    char *bloom_filename_char;
     int bloom_bits = LevelDB_ConfigMod::getInstance().getBloom_bits();;
     int max_open_files = LevelDB_ConfigMod::getInstance().getMax_open_files();
     int max_File_sizes = LevelDB_ConfigMod::getInstance().getMax_file_size();
     int bloom_type = LevelDB_ConfigMod::getInstance().getBloomType();
     bool seek_compaction_flag = LevelDB_ConfigMod::getInstance().getSeekCompactionFlag();
-    double filter_capacity_ratio = LevelDB_ConfigMod::getInstance().getFiltersCapacityRatio();
     cout<<"seek compaction flag:";
     if(seek_compaction_flag){
       cout<<"true"<<endl;
     }else{
       cout<<"false"<<endl;
     }
-    /*bool log_open = LevelDB_ConfigMod::getInstance().getOpen_log();
-    if(!log_open){
-      options.log_open = log_open;
-    }*/
+    
     bool compression_Open = LevelDB_ConfigMod::getInstance().getCompression_flag();
     bool directIO_flag = LevelDB_ConfigMod::getInstance().getDirectIOFlag();
     if(directIO_flag){
-	   options.opEp_.no_cache_io_ = true;
+	  //   options.opEp_.no_cache_io_ = true;
 	   //    leveldb::setDirectIOFlag(directIO_flag);
     }
     if(bloom_type == 1){
-	bloom_filename = LevelDB_ConfigMod::getInstance().getBloom_filename();
-	bloom_filename_char = (char *)malloc(sizeof(char)*bloom_filename.size()+1);
-	strncpy(bloom_filename_char,bloom_filename.c_str(),bloom_filename.size());
-	bloom_filename_char[bloom_filename.size()] = 0;
-	void *bloom_filename_ptr = (void *)bloom_filename_char;
-	options.filter_policy = leveldb::NewBloomFilterPolicy(reinterpret_cast<int*>(bloom_filename_ptr));
     }else if(bloom_type == 0){
 	options.filter_policy = leveldb::NewBloomFilterPolicy(bloom_bits);
     }else if(bloom_type == 2){
-	int bits_per_key_per_filter[10];
-	int i = 0;
-	std::string bits_array_filename = LevelDB_ConfigMod::getInstance().getBitsArrayFilename();
-	FILE *fp = fopen(bits_array_filename.c_str(),"r");
-	if(fp == NULL){
-	    perror("open bits_array_filename error: ");
-	}
-	char c;
-	while( (c=fgetc(fp)) != EOF){
-	    if(!(c >= '0' && c <= '9')){
-		continue;
-	    }
-	    bits_per_key_per_filter[i++] = c-'0';
-	}
-	fprintf(stderr,"bits_per_key_per_filter: ");
-	fprintf(stdout,"\nbits_per_key_per_filter: ");
-	for(int i = 0 ; bits_per_key_per_filter[i] ; i++){
-	    fprintf(stderr,"%d ",bits_per_key_per_filter[i]);
-	    fprintf(stdout,"%d ",bits_per_key_per_filter[i]);
-	}
-	fprintf(stderr,"\n");
-	printf("Counterpart bloom_bits from config:%d\n",bloom_bits);
-	options.filter_policy = leveldb::NewBloomFilterPolicy(bits_per_key_per_filter,bloom_bits);
-	options.opEp_.lrus_num_ = LevelDB_ConfigMod::getInstance().getLRUsNum();
     }else{
 	fprintf(stderr,"Wrong filter type!\n");
     }
@@ -81,12 +46,11 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     options.max_file_size = max_File_sizes;
     options.max_open_files = max_open_files;
     options.opEp_.seek_compaction_ = seek_compaction_flag;
-    options.opEp_.filter_capacity_ratio = filter_capacity_ratio;
+
     if(LevelDB_ConfigMod::getInstance().getStatisticsOpen()){
       options.opEp_.stats_ = leveldb::CreateDBStatistics();
     }
-    //    options.paranoid_checks = true;
-   // leveldb::setDirectIOFlag(directIO_flag);
+   
     leveldb::Status status = leveldb::DB::Open(options,dbfilename, &db_);
     if(!status.ok()){
 	fprintf(stderr,"can't open leveldb\n");
@@ -220,7 +184,7 @@ void LevelDB::printFilterCount()
 void LevelDB::doSomeThing(const char* thing_str)
 {
   if(strncmp(thing_str,"adjust_filter",strlen("adjust_filter")) == 0){
-    db_->DoSomeThing((void*)"adjust_filter");
+ 
   }else if(strncmp(thing_str,"printFilterCount",strlen("printFilterCount")) == 0){
     printFilterCount();
   }else if(strncmp(thing_str,"printStats",strlen("printStats")) == 0){
