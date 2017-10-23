@@ -12,18 +12,21 @@ function __runGLSM(){
     ltype=$4
     bb=$5
     workloadw_name=./workloads/glsmworkloadw_"$levelIn".spec
+    __modifyConfig directIOFlag false
     ./ycsbc -db leveldb -threads 1 -P $workloadw_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad false > "$loadname"
     sync;echo 1 > /proc/sys/vm/drop_caches
     mv "$loadname" "$dirname"
-    sleep 100s
+    sleep 120s
     workloadr_name=./workloads/glsmworkloadr_"$levelIn".spec
+    __modifyConfig directIOFlag true
     for j in `seq 1 4`
     do
 	./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true > "$runname"_"$j".txt
 	sync;echo 1 > /proc/sys/vm/drop_caches
 	mv "$runname"_"$j".txt "$dirname"
 	mv testlf.txt "$dirname"/latency_l"$levelIn"_glsmtype_"$ltype"_bloom_"$bb"_"$j".txt
-	sleep 100s
+	mv nlf.txt "$dirname"/nlatency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_"$j".txt
+	sleep 120s
     done
 }
 
@@ -49,7 +52,7 @@ function __checkOutBranch(){
 }
 #branches=(glsm)
 types=(glsm-hierarchical glsm)
-bloom_bit_array=(8)
+bloom_bit_array=(10)
 levels=(6)
 for lsmtype in ${types[@]}
 do

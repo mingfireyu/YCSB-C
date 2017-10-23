@@ -24,7 +24,7 @@ function __loadLSM(){
     sync;echo 1 > /proc/sys/vm/drop_caches
     sleep 100s
     if [ ! -d "$dirname" ]; then
-	mkdir "$dirname"
+	mkdir -p "$dirname"
     fi
     mv "$loadname" "$dirname"
 }
@@ -44,7 +44,7 @@ function __runLSM(){
 	sync;echo 1 > /proc/sys/vm/drop_caches
 	mv "$runname"_"$j".txt "$dirname"
 	mv testlf1.txt "$dirname"/latency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_"$j"_noseek_fix"$j".txt
-	mv testlf2.txt "$dirname"/latency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_"$j"_noseek_ada"$j".txt
+	#mv testlf2.txt "$dirname"/latency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_"$j"_noseek_ada"$j".txt
 	mv level?_filter_count_?.txt "$dirname"/
         sleep 100s
     done
@@ -63,7 +63,7 @@ do
     do
 	echo bloombits:"$bloombits"
 	__modifyConfig bloomBits  "$bloombits"
-	dirname=/home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian
+	dirname=/home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian/1_filters_8bits
 	__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
 	__runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
     done

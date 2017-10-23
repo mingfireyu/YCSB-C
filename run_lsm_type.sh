@@ -12,17 +12,20 @@ function __runLSM(){
     ltype=$4
     bb=$5
     workloadw_name=./workloads/glsmworkloadw_"$levelIn".spec
+    __modifyConfig directIOFlag false
     ./ycsbc -db leveldb -threads 1 -P $workloadw_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad false > "$loadname"
     sync;echo 1 > /proc/sys/vm/drop_caches
     sleep 100s
     mv "$loadname" "$dirname"
     workloadr_name=./workloads/glsmworkloadr_"$levelIn".spec
+    __modifyConfig directIOFlag true
     for j in `seq 1 4`
     do
 	./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true > "$runname"_"$j".txt
 	sync;echo 1 > /proc/sys/vm/drop_caches
 	mv "$runname"_"$j".txt "$dirname"
 	mv testlf.txt "$dirname"/latency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_"$j".txt
+	mv nlf.txt "$dirname"/nlatency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_"$j".txt
         sleep 100s
     done
 }
@@ -48,9 +51,9 @@ function __checkOutBranch(){
     make
 }
 #branches=(lsm)
-types=(lsm-hierarchical)
-bloom_bit_array=(8)
-levels=(4 5 6)
+types=(lsm-hierarchical lsm)
+bloom_bit_array=(10)
+levels=(6)
 for lsmtype in ${types[@]}
 do
     __checkOutBranch NoSeekCompaction
