@@ -12,6 +12,11 @@ function __runLSM(){
     ltype=$4
     bb=$5
     workloadw_name=./workloads/glsmworkloadw_"$levelIn".spec
+
+    if [ ! -d "$dirname" ]; then
+	mkdir -p "$dirname"
+    fi
+
     ./ycsbc -db leveldb -threads 1 -P $workloadw_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad false > "$loadname"
     sync;echo 1 > /proc/sys/vm/drop_caches
     sleep 100s
@@ -49,8 +54,8 @@ function __checkOutBranch(){
 }
 #branches=(lsm)
 types=(lsm-hierarchical)
-bloom_bit_array=(8)
-levels=(4 5 6)
+bloom_bit_array=(6)
+levels=(6)
 for lsmtype in ${types[@]}
 do
     __checkOutBranch NoSeekCompaction
@@ -69,7 +74,7 @@ do
 	       echo "lsm-hierarchical"
 	       __modifyConfig bloomFilename /home/ming/workspace/blooml"$level"_"$bloombits"_h.txt
 	   fi
-	   __runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/workspace/YCSB-C/lsm_"$DISK"_read "$level"  "$lsmtype" "$bloombits"
+	   __runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/workspace/YCSB-C/lsm_"$DISK"_read/skipratio10 "$level"  "$lsmtype" "$bloombits"
 	done
     done
 done

@@ -12,6 +12,10 @@ function __runGLSM(){
     ltype=$4
     bb=$5
     workloadw_name=./workloads/glsmworkloadw_"$levelIn".spec
+    
+    if [ ! -d "$dirname" ]; then
+        mkdir -p "$dirname"
+    fi
     ./ycsbc -db leveldb -threads 1 -P $workloadw_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad false > "$loadname"
     sync;echo 1 > /proc/sys/vm/drop_caches
     mv "$loadname" "$dirname"

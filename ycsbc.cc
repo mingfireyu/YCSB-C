@@ -33,6 +33,7 @@ int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
   int oks = 0;
   std::string out_string;
   int skipratio_inload = wl->skipratio_inload;
+  cerr<<"skipratio_inload"<<skipratio_inload<<endl;
   for (int i = 0; i < num_ops; ++i) {
     if (is_loading) {
       if(skipratio_inload&&i%skipratio_inload!=0){
