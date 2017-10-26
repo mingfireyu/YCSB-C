@@ -55,6 +55,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
 	int i = 0;
 	std::string bits_array_filename = LevelDB_ConfigMod::getInstance().getBitsArrayFilename();
 	FILE *fp = fopen(bits_array_filename.c_str(),"r");
+	FILE *fpout = fopen("bits_array.txt","w");
 	if(fp == NULL){
 	    perror("open bits_array_filename error: ");
 	}
@@ -67,14 +68,17 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
 	}
 	fprintf(stderr,"bits_per_key_per_filter: ");
 	fprintf(stdout,"\nbits_per_key_per_filter: ");
+	fprintf(fpout,"\nbits_per_key_per_filter: ");
 	for(int i = 0 ; bits_per_key_per_filter[i] ; i++){
 	    fprintf(stderr,"%d ",bits_per_key_per_filter[i]);
 	    fprintf(stdout,"%d ",bits_per_key_per_filter[i]);
+	    fprintf(fpout,"%d ",bits_per_key_per_filter[i]);
 	}
 	fprintf(stderr,"\n");
 	printf("Counterpart bloom_bits from config:%d\n",bloom_bits);
 	options.filter_policy = leveldb::NewBloomFilterPolicy(bits_per_key_per_filter,bloom_bits);
 	options.opEp_.lrus_num_ = LevelDB_ConfigMod::getInstance().getLRUsNum();
+	fclose(fpout);
     }else{
 	fprintf(stderr,"Wrong filter type!\n");
     }
@@ -97,6 +101,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
 	fprintf(stderr,"can't open leveldb\n");
 	exit(0);
     }
+
 }
 bool  LevelDB::hasRead = false;
 int LevelDB::Read(const string& table, const string& key, const vector< string >* fields, vector< DB::KVPair >& result)
