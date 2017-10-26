@@ -26,4 +26,4 @@ withoperation=false
 
 withlatency=true
 latencyfilename=testlf
-adjustfilter=true
+adjustfilter=false
