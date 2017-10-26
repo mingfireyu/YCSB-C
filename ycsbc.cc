@@ -24,17 +24,17 @@ bool StrStartWith(const char *str, const char *pre);
 string ParseCommandLine(int argc, const char *argv[], utils::Properties &props);
 bool end_flag_ = false;
 
-int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
+size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_ops,
     bool is_loading) {
   db->Init();
-  int ops[3] = {0,0,0};
+  size_t ops[3] = {0,0,0};
   double durations[] = {0,0};
   ycsbc::Client client(*db, *wl);
-  int oks = 0;
+  size_t oks = 0;
   std::string out_string;
   int skipratio_inload = wl->skipratio_inload;
   cerr<<"skipratio_inload"<<skipratio_inload<<endl;
-  for (int i = 0; i < num_ops; ++i) {
+  for (size_t i = 0; i < num_ops; ++i) {
     if (is_loading) {
       if(skipratio_inload&&i%skipratio_inload!=0){
  	continue;
@@ -73,21 +73,22 @@ int main(const int argc, const char *argv[]) {
   ycsbc::CoreWorkload wl;
   wl.Init(props);
 
-  const int num_threads = stoi(props.GetProperty("threadcount", "1"));
+  const size_t num_threads = static_cast<int>(stoi(props.GetProperty("threadcount", "1")));
   bool skipLoad = utils::StrToBool(props.GetProperty("skipLoad",
 						   "false"));
   // Loads data
   ycsbc::WallTimer loadRunTimer;
   loadRunTimer.Start();
-  vector<future<int>> actual_ops;
-  int total_ops = stoi(props[ycsbc::CoreWorkload::RECORD_COUNT_PROPERTY]);
-  int sum = 0;
+  vector<future<size_t>> actual_ops;
+  size_t total_ops = 0;
+  sscanf(props[ycsbc::CoreWorkload::RECORD_COUNT_PROPERTY].c_str(),"%zu",&total_ops);
+  size_t sum = 0;
   if(!skipLoad){
-	for (int i = 0; i < num_threads; ++i) {
+	for (size_t i = 0; i < num_threads; ++i) {
 	    actual_ops.emplace_back(async(launch::async,
 		DelegateClient, db, &wl, total_ops / num_threads, true));
 	}
-	assert((int)actual_ops.size() == num_threads);
+	assert(actual_ops.size() == num_threads);
 	for (auto &n : actual_ops) {
 	    assert(n.valid());
 	    sum += n.get();
@@ -103,11 +104,11 @@ int main(const int argc, const char *argv[]) {
   ycsbc::WallTimer timer;
   db->openStatistics();
   timer.Start();
-  for (int i = 0; i < num_threads; ++i) {
+  for (size_t i = 0; i < num_threads; ++i) {
     actual_ops.emplace_back(async(launch::async,
         DelegateClient, db, &wl, total_ops / num_threads, false));
   }
-  assert((int)actual_ops.size() == num_threads);
+  assert(actual_ops.size() == num_threads);
 
   sum = 0;
   for (auto &n : actual_ops) {
