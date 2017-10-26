@@ -58,6 +58,8 @@ private:
     bool _statistics_open;
     int _lrus_num;
     double _filters_capacity_ratio;
+    int _base_num;
+    uint64_t _life_time;
 public:
     std::string getBloom_filename();
     int getMax_open_files();
@@ -73,6 +75,8 @@ public:
     std::string getBitsArrayFilename();
     int getLRUsNum();
     double getFiltersCapacityRatio();
+    int getBaseNum();
+    uint64_t getLifeTime();
 };
 
 #endif

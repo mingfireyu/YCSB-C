@@ -23,6 +23,11 @@ double Basic_ConfigMod<T>::readFloat(const char *key){
     return _pt.get<double>(key);
 }
 
+template<typename T>
+ULL Basic_ConfigMod<T>::readULL(const char *key){
+    return _pt.get<uint64_t>(key);
+}
+
 void LevelDB_ConfigMod::setConfigPath(const char*path){
     boost::property_tree::ini_parser::read_ini(path, _pt);
     assert (!_pt.empty());
@@ -38,8 +43,11 @@ void LevelDB_ConfigMod::setConfigPath(const char*path){
     _seek_compaction_flag = readBool("basic.seekCompactionFlag");
     _statistics_open = readBool("basic.statisticsOpen");
     _bloom_bits_array_filename = readString("basic.bitsArrayFilename");
-    _lrus_num = readInt("basic.LRUNum");
-    _filters_capacity_ratio = readFloat("basic.FilterCapacityRatio");
+    
+    _lrus_num = readInt("LRU.LRUNum");
+    _filters_capacity_ratio = readFloat("LRU.FilterCapacityRatio");
+    _base_num = readInt("LRU.BaseNum");
+    _life_time = readULL("LRU.LifeTime");
 }
 /*template<typename T>
 boost::shared_ptr<T> Basic_ConfigMod<T>::instance= nullptr;*/
@@ -110,6 +118,18 @@ double LevelDB_ConfigMod::getFiltersCapacityRatio()
 {
     assert(!_pt.empty());
     return _filters_capacity_ratio;
+}
+
+int LevelDB_ConfigMod::getBaseNum()
+{
+    assert(!_pt.empty());
+    return _base_num;
+}
+
+uint64_t LevelDB_ConfigMod::getLifeTime()
+{
+    assert(!_pt.empty());
+    return _life_time;
 }
 
 template<>
