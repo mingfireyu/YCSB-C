@@ -1,6 +1,6 @@
 #!/bin/bash
 DISK=HDD
-dbfilename=/home/ming/vlog"$DISK"Dir10/lsm
+dbfilename=/home/ming/vlog"$DISK"Dir100/lsm6
 configpath=./configDir/leveldb_config.ini
 section=basic
 
@@ -52,7 +52,7 @@ function __runLSM(){
 
 types=(lsm)
 bloom_bit_array=(8)
-level=4
+level=6
 for lsmtype in ${types[@]}
 do
     __modifyConfig bloomType 0
