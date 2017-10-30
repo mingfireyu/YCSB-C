@@ -27,6 +27,7 @@ function __loadLSM(){
 	mkdir  -p "$dirname"
     fi
     mv "$loadname" "$dirname"
+    cp configDir/leveldb_config.ini "$dirname"
 }
 
 function __runLSM(){
@@ -37,7 +38,6 @@ function __runLSM(){
     ltype=$4
     bb=$5
     workloadr_name=./workloads/glsmworkloadr_"$levelIn".spec
-    __modifyConfig directIOFlag false
     for j in `seq 1 2`
     do
         ./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true > "$runname"_"$j".txt
@@ -62,7 +62,7 @@ do
     do
 	echo bloombits:"$bloombits"
 	__modifyConfig bloomBits  "$bloombits"
-	dirname=/home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian
+	dirname=/home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian/bloombits"$bloombits"level"$level"
 	__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
 	__runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
     done
