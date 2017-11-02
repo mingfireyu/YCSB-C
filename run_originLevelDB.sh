@@ -40,10 +40,16 @@ function __runLSM(){
     workloadr_name=./workloads/glsmworkloadr_"$levelIn".spec
     for j in `seq 1 2`
     do
+	let count=300/"$j"
+	vmstat -n "$j" "$count"  > vmstat_"$count".txt &
         ./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true > "$runname"_"$j".txt
 	sync;echo 1 > /proc/sys/vm/drop_caches
+	if [ ! -d "$dirname" ]; then
+	    mkdir  -p "$dirname"
+	fi
 	mv "$runname"_"$j".txt "$dirname"
 	mv testlf1.txt "$dirname"/latency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_"$j"_noseek_fix"$j".txt
+	cp vmstat_"$count".txt "$dirname"/vmstat_count"$count"_"$j".txt
         sleep 100s
     done
 
@@ -62,8 +68,8 @@ do
     do
 	echo bloombits:"$bloombits"
 	__modifyConfig bloomBits  "$bloombits"
-	dirname=/home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian/bloombits"$bloombits"level"$level"
-	__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
+	dirname=/home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian/bloombits"$bloombits"level"$level"/enough_open_files_not_found_100W
+	#__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
 	__runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
     done
 done
