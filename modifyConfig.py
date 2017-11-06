@@ -15,8 +15,6 @@ def modifyCon(filename,section,key,value):
     cf = myconf()
     cf.read(filename)
     cf.set(section,key,value);
-    if key == "locationCacheSize":
-            cf.set("misc","hashTableDefaultSize",str(int(value)+2))
     with open(filename,"w+") as f:
         cf.write(f)
 

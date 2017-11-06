@@ -60,6 +60,7 @@ private:
     double _filters_capacity_ratio;
     int _base_num;
     uint64_t _life_time;
+    bool _setFreCountInCompaction;
 public:
     std::string getBloom_filename();
     int getMax_open_files();
@@ -77,6 +78,7 @@ public:
     double getFiltersCapacityRatio();
     int getBaseNum();
     uint64_t getLifeTime();
+    bool getSetFreCountInCompaction();
 };
 
 #endif

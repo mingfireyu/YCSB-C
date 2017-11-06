@@ -23,15 +23,15 @@ extern bool end_flag_;
 namespace ycsbc {
 static const char iops_filename_[2][50]={"write_iops.txt","read_iops.txt"};
 static FILE *f_ops[2];
-static int last_ops[2]={0,0};
+static size_t last_ops[2]={0,0};
 
 void *ReportInLoop(void *arg){
-  int *ops = static_cast<int*>(arg);
+  size_t *ops = static_cast<size_t*>(arg);
   while(!end_flag_){
     for(int i = 0 ; i < 2 ; i++){
       if(f_ops[i]){
-	int current_ops = ops[i];
-	fprintf(f_ops[i],"%d,",current_ops-last_ops[i]);
+	size_t current_ops = ops[i];
+	fprintf(f_ops[i],"%lu,",current_ops-last_ops[i]);
 	last_ops[i] = current_ops;
       }
     }
@@ -103,7 +103,7 @@ class Client {
   }
   
   virtual bool DoInsert();
-  virtual bool DoTransaction(int ops[],double durations[]);
+  virtual bool DoTransaction(size_t ops[],double durations[]);
   
   virtual ~Client() { 
       if(latency_fp_){
@@ -141,7 +141,7 @@ inline bool Client::DoInsert() {
 }
 
 
-inline bool Client::DoTransaction(int ops[],double durations[]) {
+inline bool Client::DoTransaction(size_t ops[],double durations[]) {
   int status = -1;
   unsigned long long latency;
   if(!first_do_transaction){

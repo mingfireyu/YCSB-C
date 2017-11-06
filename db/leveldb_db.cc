@@ -24,7 +24,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     double filter_capacity_ratio = LevelDB_ConfigMod::getInstance().getFiltersCapacityRatio();
     int base_num = LevelDB_ConfigMod::getInstance().getBaseNum();
     uint64_t life_time = LevelDB_ConfigMod::getInstance().getLifeTime();
-    
+    bool setFreCountInCompaction = LevelDB_ConfigMod::getInstance().getSetFreCountInCompaction();
     cout<<"seek compaction flag:";
     if(seek_compaction_flag){
       cout<<"true"<<endl;
@@ -91,6 +91,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     options.opEp_.filter_capacity_ratio = filter_capacity_ratio;
     options.opEp_.life_time = life_time;
     options.opEp_.base_num = base_num;
+    options.opEp_.setFreCountInCompaction = setFreCountInCompaction;
     if(LevelDB_ConfigMod::getInstance().getStatisticsOpen()){
       options.opEp_.stats_ = leveldb::CreateDBStatistics();
     }
