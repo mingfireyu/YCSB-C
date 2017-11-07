@@ -43,7 +43,7 @@ void LevelDB_ConfigMod::setConfigPath(const char*path){
     _seek_compaction_flag = readBool("basic.seekCompactionFlag");
     _statistics_open = readBool("basic.statisticsOpen");
     _bloom_bits_array_filename = readString("basic.bitsArrayFilename");
-    
+    _setFreCountInCompaction = readBool("basic.setFreCountInCompaction");
     _lrus_num = readInt("LRU.LRUNum");
     _filters_capacity_ratio = readFloat("LRU.FilterCapacityRatio");
     _base_num = readInt("LRU.BaseNum");
@@ -130,6 +130,11 @@ uint64_t LevelDB_ConfigMod::getLifeTime()
 {
     assert(!_pt.empty());
     return _life_time;
+}
+
+bool LevelDB_ConfigMod::getSetFreCountInCompaction(){
+    assert(!_pt.empty());
+    return _setFreCountInCompaction;
 }
 
 template<>
