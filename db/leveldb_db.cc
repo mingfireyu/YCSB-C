@@ -27,9 +27,9 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
 	bloom_filename_char[bloom_filename.size()] = 0;
     }else{
 	bloom_bits = LevelDB_ConfigMod::getInstance().getBloom_bits();
+	printf("bloom_bits from config:%d\n",bloom_bits);
     }
     
-    printf("bloom_bits from config:%d\n",bloom_bits);
     options.create_if_missing = true;
     options.compression = compression_Open?leveldb::kSnappyCompression:leveldb::kNoCompression;  //compression is disabled.
     options.max_file_size = max_File_sizes;

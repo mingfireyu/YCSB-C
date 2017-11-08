@@ -168,6 +168,7 @@ inline bool Client::DoTransaction(size_t ops[],double durations[]) {
 	  }else if(status == DB::kErrorNoData){
 	     fprintf(nlatency_fp_,"%llu,",latency);
 	     ops[2]++;
+	     durations[2] += latency;
 	  }
       }
       ops[READ]++;

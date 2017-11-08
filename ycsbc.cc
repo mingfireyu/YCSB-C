@@ -28,12 +28,14 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
     bool is_loading) {
   db->Init();
   size_t ops[3] = {0,0,0};
-  double durations[] = {0,0};
+  double durations[] = {0,0,0};
   ycsbc::Client client(*db, *wl);
   size_t oks = 0;
   std::string out_string;
   int skipratio_inload = wl->skipratio_inload;
+  struct timeval start_insert_time,end_insert_time,res_time;
   cerr<<"skipratio_inload"<<skipratio_inload<<endl;
+  gettimeofday(&start_insert_time,NULL);
   for (size_t i = 0; i < num_ops; ++i) {
     if (is_loading) {
       if(skipratio_inload&&i%skipratio_inload!=0){
@@ -47,13 +49,19 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
       cerr<<"operation count:"<<i<<"\r";
     }
   }
+  gettimeofday(&end_insert_time,NULL);
+  timersub(&end_insert_time,&start_insert_time,&res_time);
   cout<<endl;
   if(!is_loading){
     cout<<"WRITE latency"<<endl;
     cout<<durations[ycsbc::Operation::INSERT]/ops[ycsbc::Operation::INSERT]<<"us"<<"Write ops:"<<ops[ycsbc::Operation::INSERT]<<endl;
     cout<<"READ latency"<<endl;
     cout<<durations[ycsbc::Operation::READ]/ops[ycsbc::Operation::READ]<<"us"<<"Read ops:"<<ops[ycsbc::Operation::READ]<<endl;
-     cout<<"Not found num: "<<ops[2]<<endl;
+    cout<<"Zero-result lookup: "<<endl;
+    cout<<durations[2]/ops[2]<<"us"<<" Zero-result ops: "<<ops[2]<<endl;
+  }else{
+    cout<<"Total time of insert: "<<res_time.tv_sec * 1000000 + res_time.tv_usec<<"us"<<endl;
+    cout<<"Per insert time: "<<(res_time.tv_sec * 1000000 + res_time.tv_usec)*1.0/num_ops<<"us"<<endl;
   }
   end_flag_ = true;
   db->Close();
