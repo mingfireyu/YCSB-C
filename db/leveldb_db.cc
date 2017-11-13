@@ -30,7 +30,8 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     bool compression_Open = LevelDB_ConfigMod::getInstance().getCompression_flag();
     bool directIO_flag = LevelDB_ConfigMod::getInstance().getDirectIOFlag();
     if(directIO_flag){
-	  //   options.opEp_.no_cache_io_ = true;
+	   options.opEp_.no_cache_io_ = true;
+	   fprintf(stderr,"directIO\n");
 	   //    leveldb::setDirectIOFlag(directIO_flag);
     }
     if(bloom_type == 1){
