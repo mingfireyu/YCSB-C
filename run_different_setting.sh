@@ -38,38 +38,40 @@ function __runLSM(){
     ltype=$4
     bb=$5
     workloadr_name=./workloads/glsmworkloadr_"$levelIn".spec
-    base_nums=(8 16 32)
-    life_times=(100 1000 10000)
+    base_nums=(32 64 96)
+    life_times=(10000 20000 25000 30000 40000)
     __modifyConfig directIOFlag true
     if [ ! -d "$dirname" ]; then
 	mkdir  -p "$dirname"
     fi
+    section=LRU
     for base_num in ${base_nums[@]}
-#    for life_time in ${life_times[@]}
-     do
-#	echo life_time "$life_time"
+    do
 	echo base_num "$base_num"
-	section=LRU
-#	__modifyConfig LifeTime "$life_time"
 	__modifyConfig BaseNum "$base_num"
-        ./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true > "$runname"_base"$base_num".txt
-#	./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true > "$runname"_life_time"$life_time".txt
-	sync;echo 1 > /proc/sys/vm/drop_caches
-	mv "$runname"_base"$base_num".txt "$dirname"
-#	mv "$runname"_life_time"$life_time".txt "$dirname"
-	mv testlf1.txt "$dirname"/latency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_base"$base_num".txt
-	mv level?_access_frequencies.txt "$dirname"/
-        sleep 100s
-    done
+	for life_time in ${life_times[@]}
+	do
+	    echo life_time "$life_time"
+	    __modifyConfig LifeTime "$life_time"
+            ./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true > "$runname"_base"$base_num"_lifetime"$life_time".txt
+	    #	./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true > "$runname"_life_time"$life_time".txt
+	    sync;echo 1 > /proc/sys/vm/drop_caches
+	    mv "$runname"_base"$base_num"_lifetime"$life_time".txt "$dirname"/
+	    mv testlf1.txt "$dirname"/latency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_base"$base_num"_lifetime"$life_time".txt
+	    mv nlf1.txt "$dirname"/nlatency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_base"$base_num"_lifetime"$life_time".txt
+	    mv level?_access_frequencies.txt "$dirname"/
+            sleep 100s
+	done
+    done	
     cp configDir/leveldb_config.ini "$dirname"/
 }
 
 
-types=(lsm)
+lsmtype=(lsm)
 bloombits=6
 level=6
 dbfilename="$dbfilename""$level"
-FilterCapacityRatios=(4.0 6.0)
+FilterCapacityRatios=(6.0 5.0)
 logbases=(4 5 6)
 for FilterCapacityRatio in ${FilterCapacityRatios[@]}
 do
