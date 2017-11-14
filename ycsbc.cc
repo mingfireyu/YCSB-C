@@ -65,7 +65,7 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
     cout<<durations[ycsbc::Operation::READ]/ops[ycsbc::Operation::READ]<<"us"<<" Read ops: "<<ops[ycsbc::Operation::READ]<<endl;
     cout<<"Zero-result lookup: "<<endl;
     cout<<durations[2]/ops[2]<<"us"<<" Zero-result ops: "<<ops[2]<<endl;
-    db->doSomeThing("printFilterCount");
+    db->doSomeThing("printAccessFreq");
     db->doSomeThing("printStats");
     if(wl->adjust_filter_&&!end_flag_){
       end_flag_ = true;
