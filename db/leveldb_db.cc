@@ -75,11 +75,11 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
 	    fprintf(stdout,"%d ",bits_per_key_per_filter[i]);
 	    fprintf(fpout,"%d ",bits_per_key_per_filter[i]);
 	}
+	//options.opEp_.lrus_num_ = LevelDB_ConfigMod::getInstance().getLRUsNum();
+	options.opEp_.lrus_num_ = i;
+	options.filter_policy = leveldb::NewBloomFilterPolicy(bits_per_key_per_filter,bloom_bits);
 	fprintf(stderr,"\n");
 	printf("Counterpart bloom_bits from config:%d\n",bloom_bits);
-	options.filter_policy = leveldb::NewBloomFilterPolicy(bits_per_key_per_filter,bloom_bits);
-	options.opEp_.lrus_num_ = LevelDB_ConfigMod::getInstance().getLRUsNum();
-	options.opEp_.log_base = LevelDB_ConfigMod::getInstance().getLogBase();
 	fclose(fpout);
     }else{
 	fprintf(stderr,"Wrong filter type!\n");
@@ -241,7 +241,7 @@ void LevelDB::doSomeThing(const char* thing_str)
     db_->GetProperty("leveldb.stats",&stat_str);
     cout<<stat_str<<endl;
   }else if(strncmp(thing_str,"printAccessFreq",strlen("printAccessFreq")) == 0){
-    printAccessFreq();
+	printAccessFreq();
   }
 }
 
