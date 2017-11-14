@@ -48,6 +48,7 @@ void LevelDB_ConfigMod::setConfigPath(const char*path){
     _filters_capacity_ratio = readFloat("LRU.FilterCapacityRatio");
     _base_num = readInt("LRU.BaseNum");
     _life_time = readULL("LRU.LifeTime");
+    _logBase = readInt("LRU.LogBase");
 }
 /*template<typename T>
 boost::shared_ptr<T> Basic_ConfigMod<T>::instance= nullptr;*/
@@ -135,6 +136,11 @@ uint64_t LevelDB_ConfigMod::getLifeTime()
 bool LevelDB_ConfigMod::getSetFreCountInCompaction(){
     assert(!_pt.empty());
     return _setFreCountInCompaction;
+}
+
+int LevelDB_ConfigMod::getLogBase(){
+    assert(!_pt.empty());
+    return _logBase;
 }
 
 template<>

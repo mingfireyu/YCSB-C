@@ -4,7 +4,6 @@
 #include <string>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
-#include <boost/concept_check.hpp>
 #include <boost/smart_ptr.hpp>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -61,6 +60,7 @@ private:
     int _base_num;
     uint64_t _life_time;
     bool _setFreCountInCompaction;
+    int _logBase;
 public:
     std::string getBloom_filename();
     int getMax_open_files();
@@ -79,6 +79,7 @@ public:
     int getBaseNum();
     uint64_t getLifeTime();
     bool getSetFreCountInCompaction();
+    int getLogBase();
 };
 
 #endif
