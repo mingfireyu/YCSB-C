@@ -1,6 +1,7 @@
 #!/bin/bash
-DISK=SSD
-dbfilename=/home/ming/vlog"$DISK"Dir100/lsm
+experiment_time=6
+DISK=SSD"$experiment_time"
+dbfilename=/home/ming/RAID0_"$DISK"/lsm
 configpath=./configDir/leveldb_config.ini
 section=basic
 
@@ -38,6 +39,7 @@ function __runLSM(){
     ltype=$4
     bb=$5
     workloadr_name=./workloads/glsmworkloadr_"$levelIn".spec
+    __modifyConfig directIOFlag true
     for j in `seq 1 2`
     do
 	let count=300/"$j"
@@ -49,6 +51,7 @@ function __runLSM(){
 	fi
 	mv "$runname"_"$j".txt "$dirname"
 	mv testlf1.txt "$dirname"/latency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_"$j"_noseek_fix"$j".txt
+	mv nlf1.txt "$dirname"/nlatency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_"$j"_noseek_fix"$j".txt
 	cp vmstat_"$count".txt "$dirname"/vmstat_count"$count"_"$j".txt
         sleep 100s
     done
@@ -57,18 +60,20 @@ function __runLSM(){
 
 
 types=(lsm)
-bloom_bit_array=(8)
+bloom_bit_array=(6)
 level=6
 dbfilename="$dbfilename""$level"
+maxOpenfiles=55986
 for lsmtype in ${types[@]}
 do
     __modifyConfig bloomType 0
     __modifyConfig seekCompactionFlag false
+    __modifyConfig maxOpenfiles "$maxOpenfiles"
     for bloombits in ${bloom_bit_array[@]}
     do
 	echo bloombits:"$bloombits"
 	__modifyConfig bloomBits  "$bloombits"
-	dirname=/home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian/bloombits"$bloombits"level"$level"/enough_open_files_not_found_100W
+	dirname=/home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian1.1/experiment"$experiment_time"/bloombits"$bloombits"level"$level"/open_files_"$maxOpenfiles"_allfound_300WRead
 	#__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
 	__runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
     done

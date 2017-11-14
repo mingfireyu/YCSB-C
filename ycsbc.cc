@@ -31,7 +31,7 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
     db->Init();
   }
   size_t ops[3] = {0,0,0};
-  double durations[] = {0,0};
+  double durations[] = {0,0,0};
   ycsbc::Client client(*db, *wl);
   size_t oks = 0;
   std::string out_string;
@@ -63,7 +63,8 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
     cout<<durations[ycsbc::Operation::INSERT]/ops[ycsbc::Operation::INSERT]<<"us"<<"Write ops:"<<ops[ycsbc::Operation::INSERT]<<endl;
     cout<<"READ latency"<<endl;
     cout<<durations[ycsbc::Operation::READ]/ops[ycsbc::Operation::READ]<<"us"<<"Read ops:"<<ops[ycsbc::Operation::READ]<<endl;
-    cout<<"Not found num: "<<ops[2]<<endl;
+    cout<<"Zero-result lookup: "<<endl;
+    cout<<durations[2]/ops[2]<<"us"<<" Zero-result ops: "<<ops[2]<<endl;
     db->doSomeThing("printStats");
   }else{
     cout<<"Total time of insert: "<<res_time.tv_sec * 1000000 + res_time.tv_usec<<"us"<<endl;
