@@ -38,8 +38,8 @@ function __runLSM(){
     ltype=$4
     bb=$5
     workloadr_name=./workloads/glsmworkloadr_"$levelIn".spec
-    base_nums=(32 64 96)
-    life_times=(10000 20000 25000 30000 40000)
+    base_nums=(32 8 16)
+    life_times=(10000 20000 25000)
     __modifyConfig directIOFlag true
     if [ ! -d "$dirname" ]; then
 	mkdir  -p "$dirname"
@@ -54,7 +54,7 @@ function __runLSM(){
 	    echo life_time "$life_time"
 	    __modifyConfig LifeTime "$life_time"
             ./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true > "$runname"_base"$base_num"_lifetime"$life_time".txt
-	    #	./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true > "$runname"_life_time"$life_time".txt
+	    #./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true > "$runname"_life_time"$life_time".txt
 	    sync;echo 1 > /proc/sys/vm/drop_caches
 	    mv "$runname"_base"$base_num"_lifetime"$life_time".txt "$dirname"/
 	    mv testlf1.txt "$dirname"/latency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_base"$base_num"_lifetime"$life_time".txt
@@ -72,7 +72,7 @@ bloombits=6
 level=6
 dbfilename="$dbfilename""$level"
 FilterCapacityRatios=(6.0 5.0)
-logbases=(4 5 6)
+logbases=(4 5)
 for FilterCapacityRatio in ${FilterCapacityRatios[@]}
 do
     __modifyConfig bloomType 2
@@ -87,7 +87,7 @@ do
 	section=LRU
 	__modifyConfig LogBase "$logbase"
 	section=basic
-	dirname=/home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian1.1_multi_filter/experiment"$experiment_time"/BGShrinkUsage_FilterCapacityRatio_"$FilterCapacityRatio"_logbase_"$logbase"lru0_300WRead
+	dirname=/home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian1.2_multi_filter/experiment"$experiment_time"/BGShrinkUsage_FilterCapacityRatio_"$FilterCapacityRatio"_logbase_"$logbase"lru0_300WRead
 	#__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
 	__runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
     done
