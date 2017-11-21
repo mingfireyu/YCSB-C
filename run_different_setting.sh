@@ -32,14 +32,15 @@ function __loadLSM(){
 
 function __runLSM(){
     runname=$1
-    runname="$runname"_run
+    runname="$runname"_run_initfilter
     dirname=$2
     levelIn=$3
     ltype=$4
     bb=$5
     workloadr_name=./workloads/glsmworkloadr_"$levelIn".spec
-    base_nums=(32 8 16)
-    life_times=(10000 20000 25000)
+    base_nums=(16 8)
+    life_times=(10000 20000)
+    slow_ratios=(0.5)
     __modifyConfig directIOFlag true
     if [ ! -d "$dirname" ]; then
 	mkdir  -p "$dirname"
@@ -71,8 +72,9 @@ lsmtype=(lsm)
 bloombits=6
 level=6
 dbfilename="$dbfilename""$level"
-FilterCapacityRatios=(6.0 5.0)
-logbases=(4 5)
+FilterCapacityRatios=(6.5)
+logbases=(4)
+
 for FilterCapacityRatio in ${FilterCapacityRatios[@]}
 do
     __modifyConfig bloomType 2
@@ -87,7 +89,7 @@ do
 	section=LRU
 	__modifyConfig LogBase "$logbase"
 	section=basic
-	dirname=/home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian1.2_multi_filter/experiment"$experiment_time"/BGShrinkUsage_FilterCapacityRatio_"$FilterCapacityRatio"_logbase_"$logbase"lru0_300WRead
+	dirname=/home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian0.99_multi_filter/experiment"$experiment_time"/BGShrinkUsage_FilterCapacityRatio_"$FilterCapacityRatio"_logbase_"$logbase"lru0_300WRead
 	#__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
 	__runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
     done

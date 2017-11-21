@@ -61,6 +61,7 @@ private:
     uint64_t _life_time;
     bool _setFreCountInCompaction;
     int _logBase;
+    double _slowRatio;
 public:
     std::string getBloom_filename();
     int getMax_open_files();
@@ -80,6 +81,7 @@ public:
     uint64_t getLifeTime();
     bool getSetFreCountInCompaction();
     int getLogBase();
+    double getSlowRatio();
 };
 
 #endif

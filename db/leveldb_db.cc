@@ -25,6 +25,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     int base_num = LevelDB_ConfigMod::getInstance().getBaseNum();
     uint64_t life_time = LevelDB_ConfigMod::getInstance().getLifeTime();
     bool setFreCountInCompaction = LevelDB_ConfigMod::getInstance().getSetFreCountInCompaction();
+    double slow_ratio = LevelDB_ConfigMod::getInstance().getSlowRatio();
     cout<<"seek compaction flag:";
     if(seek_compaction_flag){
       cout<<"true"<<endl;
@@ -70,7 +71,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
 	fprintf(stderr,"bits_per_key_per_filter: ");
 	fprintf(stdout,"\nbits_per_key_per_filter: ");
 	fprintf(fpout,"\nbits_per_key_per_filter: ");
-	for(int i = 0 ; bits_per_key_per_filter[i] ; i++){
+	for(i = 0 ; bits_per_key_per_filter[i] ; i++){
 	    fprintf(stderr,"%d ",bits_per_key_per_filter[i]);
 	    fprintf(stdout,"%d ",bits_per_key_per_filter[i]);
 	    fprintf(fpout,"%d ",bits_per_key_per_filter[i]);
@@ -94,6 +95,8 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     options.opEp_.life_time = life_time;
     options.opEp_.base_num = base_num;
     options.opEp_.setFreCountInCompaction = setFreCountInCompaction;
+    options.opEp_.slow_ratio = slow_ratio;
+    fprintf(stderr,"base_num: %d, slow_ratio %.2lf\n",base_num,slow_ratio);
     if(LevelDB_ConfigMod::getInstance().getStatisticsOpen()){
       options.opEp_.stats_ = leveldb::CreateDBStatistics();
     }
