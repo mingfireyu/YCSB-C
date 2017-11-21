@@ -1,12 +1,13 @@
 #!/bin/bash
-DISK=SSD
-dbfilename=/home/ming/vlog"$DISK"Dir100/lsm
-function __runLSM(){
+experiment_time=2
+DISK=HDD"$experiment_time"
+dbfilename=/home/ming/RAID0_"$DISK"/hlsm
+
+
+function __loadLSM(){
     rm -rf "$dbfilename"
     loadname=$1
     loadname="$loadname"_load.txt
-    runname=$1
-    runname="$runname"_run
     dirname=$2
     levelIn=$3
     ltype=$4
@@ -21,6 +22,21 @@ function __runLSM(){
     sync;echo 1 > /proc/sys/vm/drop_caches
     sleep 100s
     mv "$loadname" "$dirname"
+    
+}
+function __runLSM(){
+    runname=$1
+    runname="$runname"_run
+    dirname=$2
+    levelIn=$3
+    ltype=$4
+    bb=$5
+
+
+    if [ ! -d "$dirname" ]; then
+	mkdir -p "$dirname"
+    fi
+
     workloadr_name=./workloads/glsmworkloadr_"$levelIn".spec
     for j in `seq 1 4`
     do
@@ -54,7 +70,7 @@ function __checkOutBranch(){
 }
 #branches=(lsm)
 types=(lsm-hierarchical)
-bloom_bit_array=(6)
+bloom_bit_array=(10)
 levels=(6)
 for lsmtype in ${types[@]}
 do
@@ -72,9 +88,10 @@ do
 	       __modifyConfig bloomFilename /home/ming/workspace/blooml"$level"_"$bloombits".txt
 	   else
 	       echo "lsm-hierarchical"
-	       __modifyConfig bloomFilename /home/ming/workspace/blooml"$level"_"$bloombits"_h.txt
+	       __modifyConfig bloomFilename /home/ming/workspace/blooml"$level"_"$bloombits"_h1.txt
 	   fi
-	   __runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/workspace/YCSB-C/lsm_"$DISK"_read/skipratio10 "$level"  "$lsmtype" "$bloombits"
+	  # __loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian/experiment"$experiment_time"/skipratio2 "$level"  "$lsmtype" "$bloombits"
+	   __runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian/experiment"$experiment_time"/skipratio2 "$level"  "$lsmtype" "$bloombits"
 	done
     done
 done
