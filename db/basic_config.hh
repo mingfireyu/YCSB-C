@@ -62,6 +62,7 @@ private:
     bool _setFreCountInCompaction;
     int _logBase;
     double _slowRatio;
+    double _changeRatio;
 public:
     std::string getBloom_filename();
     int getMax_open_files();
@@ -82,6 +83,7 @@ public:
     bool getSetFreCountInCompaction();
     int getLogBase();
     double getSlowRatio();
+    double getChangeRatio();
 };
 
 #endif
