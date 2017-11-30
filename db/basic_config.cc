@@ -23,6 +23,11 @@ double Basic_ConfigMod<T>::readFloat(const char *key){
     return _pt.get<double>(key);
 }
 
+template<typename T>
+size_t Basic_ConfigMod<T>::readSize_t(const char *key){
+   return _pt.get<size_t>(key);
+}
+
 void LevelDB_ConfigMod::setConfigPath(const char*path){
     boost::property_tree::ini_parser::read_ini(path, _pt);
     assert (!_pt.empty());
@@ -40,6 +45,7 @@ void LevelDB_ConfigMod::setConfigPath(const char*path){
     _bloom_bits_array_filename = readString("basic.bitsArrayFilename");
     _lrus_num = readInt("basic.LRUNum");
     _filters_capacity_ratio = readFloat("basic.FilterCapacityRatio");
+    _blockCacheSize = readSize_t("basic._blockCacheSize");
 }
 /*template<typename T>
 boost::shared_ptr<T> Basic_ConfigMod<T>::instance= nullptr;*/
@@ -110,6 +116,10 @@ double LevelDB_ConfigMod::getFiltersCapacityRatio()
 {
     assert(!_pt.empty());
     return _filters_capacity_ratio;
+}
+size_t LevelDB_ConfigMod::getBlockCacheSize(){
+    assert(!_pt.empty());
+    return _blockCacheSize;
 }
 
 template<>

@@ -58,6 +58,7 @@ private:
     bool _statistics_open;
     int _lrus_num;
     double _filters_capacity_ratio;
+    size_t _blockCacheSize;
 public:
     std::string getBloom_filename();
     int getMax_open_files();
@@ -73,6 +74,7 @@ public:
     std::string getBitsArrayFilename();
     int getLRUsNum();
     double getFiltersCapacityRatio();
+    size_t getBlockCacheSize();
 };
 
 #endif

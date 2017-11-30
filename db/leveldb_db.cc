@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <memory>
 #include <vector>
+#include <leveldb/cache.h>
 using namespace std;
 
 namespace ycsbc {
@@ -20,6 +21,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     int max_File_sizes = LevelDB_ConfigMod::getInstance().getMax_file_size();
     int bloom_type = LevelDB_ConfigMod::getInstance().getBloomType();
     bool seek_compaction_flag = LevelDB_ConfigMod::getInstance().getSeekCompactionFlag();
+    size_t block_cache_size = LevelDB_ConfigMod::getInstance().getBlockCacheSize();
     cout<<"seek compaction flag:";
     if(seek_compaction_flag){
       cout<<"true"<<endl;
@@ -47,7 +49,8 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     options.max_file_size = max_File_sizes;
     options.max_open_files = max_open_files;
     options.opEp_.seek_compaction_ = seek_compaction_flag;
-
+    options.block_cache = leveldb::NewLRUCache(block_cache_size);
+    fprintf(stderr," block_cache_size %lu \n",block_cache_size);
     if(LevelDB_ConfigMod::getInstance().getStatisticsOpen()){
       options.opEp_.stats_ = leveldb::CreateDBStatistics();
     }
