@@ -1,5 +1,5 @@
 #!/bin/bash
-experiment_time=6
+experiment_time=4
 DISK=SSD"$experiment_time"
 dbfilename=/home/ming/RAID0_"$DISK"/hlsm
 function __loadLSM(){
@@ -23,7 +23,7 @@ function __loadLSM(){
     mv "$loadname" "$dirname"
 }
 
-function __rumLSM(){
+function __runLSM(){
     loadname=$1
     runname=$1
     runname="$runname"_run
@@ -66,8 +66,8 @@ function __checkOutBranch(){
 }
 #branches=(lsm)
 types=(lsm-hierarchical)
-bloom_bit_array=(6)
-levels=(6)
+bloom_bit_array=(2)
+level=6
 for lsmtype in ${types[@]}
 do
     __checkOutBranch NoSeekCompaction
@@ -76,20 +76,18 @@ do
     do
 	echo bloombits:"$bloombits"
 	__modifyConfig bloomBits  "$bloombits"
-	for level in ${levels[@]}
-	do
-	   echo level:"$level"
-	   dbfilename="$dbfilename""$level"
-	   if [ "$lsmtype" = "lsm" ]; then
-	       echo "lsm"
-	       __modifyConfig bloomFilename /home/ming/workspace/blooml"$level"_"$bloombits".txt
-	   else
-	       echo "lsm-hierarchical"
-	       __modifyConfig bloomFilename /home/ming/workspace/blooml"$level"_"$bloombits"_h1.txt
-	   fi
-	   __loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/workspace/YCSB-C/lsm_"$DISK"_read/skipratio2 "$level"  "$lsmtype" "$bloombits"
-	   __runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/workspace/YCSB-C/lsm_"$DISK"_read/skipratio2 "$level"  "$lsmtype" "$bloombits"
-	done
+	echo level:"$level"
+	dbfilename="$dbfilename""$level"
+	if [ "$lsmtype" = "lsm" ]; then
+	    echo "lsm"
+	    __modifyConfig bloomFilename /home/ming/workspace/blooml"$level"_"$bloombits".txt
+	else
+	    echo "lsm-hierarchical"
+	    __modifyConfig bloomFilename /home/ming/workspace/blooml"$level"_"$bloombits"_h1.txt
+	fi
+	__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/workspace/YCSB-C/lsm_"$DISK"_read/skipratio2_zip1.2 "$level"  "$lsmtype" "$bloombits"
+	__runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/workspace/YCSB-C/lsm_"$DISK"_read/skipratio2_zip1.2 "$level"  "$lsmtype" "$bloombits"
+
     done
 done
 
