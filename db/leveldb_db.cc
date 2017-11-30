@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <memory>
 #include <vector>
+#include <leveldb/cache.h>
 using namespace std;
 
 namespace ycsbc {
@@ -28,6 +29,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     double slow_ratio = LevelDB_ConfigMod::getInstance().getSlowRatio();
     double change_ratio = LevelDB_ConfigMod::getInstance().getChangeRatio();
     int init_filter_num = LevelDB_ConfigMod::getInstance().getInitFilterNum();
+    size_t block_cache_size = LevelDB_ConfigMod::getInstance().getBlockCacheSize();
     cout<<"seek compaction flag:";
     if(seek_compaction_flag){
       cout<<"true"<<endl;
@@ -100,7 +102,9 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     options.opEp_.slow_ratio = slow_ratio;
     options.opEp_.change_ratio = change_ratio;
     options.opEp_.init_filter_nums = init_filter_num;
-    fprintf(stderr,"base_num: %d, slow_ratio %.2lf change_ratio %.5lf init_filter_num:%d\n",base_num,slow_ratio,change_ratio,init_filter_num);
+    options.block_cache = leveldb::NewLRUCache(block_cache_size);
+    fprintf(stderr,"filter_capacity_ratio: %.3lf, init_filter_num:%d change_ratio %.5lf block_cache_size %lu MB\n",filter_capacity_ratio,init_filter_num,change_ratio,block_cache_size/1024/1024);
+
     if(LevelDB_ConfigMod::getInstance().getStatisticsOpen()){
       options.opEp_.stats_ = leveldb::CreateDBStatistics();
     }

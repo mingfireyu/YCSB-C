@@ -64,6 +64,7 @@ private:
     int _init_filter_num;
     double _slowRatio;
     double _changeRatio;
+    size_t _blockCacheSize;
 public:
     std::string getBloom_filename();
     int getMax_open_files();
@@ -86,6 +87,7 @@ public:
     int getInitFilterNum();
     double getSlowRatio();
     double getChangeRatio();
+    size_t getBlockCacheSize();
 };
 
 #endif

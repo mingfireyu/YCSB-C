@@ -28,6 +28,11 @@ ULL Basic_ConfigMod<T>::readULL(const char *key){
     return _pt.get<uint64_t>(key);
 }
 
+template<typename T>
+size_t Basic_ConfigMod<T>::readSize_t(const char *key){
+    return _pt.get<size_t>(key);
+}
+
 void LevelDB_ConfigMod::setConfigPath(const char*path){
     boost::property_tree::ini_parser::read_ini(path, _pt);
     assert (!_pt.empty());
@@ -52,6 +57,8 @@ void LevelDB_ConfigMod::setConfigPath(const char*path){
     _slowRatio = readFloat("LRU.slowRatio");
     _changeRatio = readFloat("LRU.changeRatio");
     _init_filter_num = readFloat("LRU.initFilterNum");
+    _blockCacheSize = readSize_t("basic.blockCacheSize");
+
 }
 /*template<typename T>
 boost::shared_ptr<T> Basic_ConfigMod<T>::instance= nullptr;*/
@@ -156,9 +163,14 @@ double LevelDB_ConfigMod::getChangeRatio(){
     return _changeRatio;
 }
 
+
 int LevelDB_ConfigMod::getInitFilterNum(){
     assert(!_pt.empty());
     return _init_filter_num;
+}
+size_t LevelDB_ConfigMod::getBlockCacheSize(){
+    assert(!_pt.empty());
+    return _blockCacheSize;
 }
 
 template<>
