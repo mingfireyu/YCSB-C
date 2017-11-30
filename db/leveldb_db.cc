@@ -27,6 +27,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     bool setFreCountInCompaction = LevelDB_ConfigMod::getInstance().getSetFreCountInCompaction();
     double slow_ratio = LevelDB_ConfigMod::getInstance().getSlowRatio();
     double change_ratio = LevelDB_ConfigMod::getInstance().getChangeRatio();
+    int init_filter_num = LevelDB_ConfigMod::getInstance().getInitFilterNum();
     cout<<"seek compaction flag:";
     if(seek_compaction_flag){
       cout<<"true"<<endl;
@@ -98,7 +99,8 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     options.opEp_.setFreCountInCompaction = setFreCountInCompaction;
     options.opEp_.slow_ratio = slow_ratio;
     options.opEp_.change_ratio = change_ratio;
-    fprintf(stderr,"base_num: %d, slow_ratio %.2lf change_ratio %.5lf\n",base_num,slow_ratio,change_ratio);
+    options.opEp_.init_filter_nums = init_filter_num;
+    fprintf(stderr,"base_num: %d, slow_ratio %.2lf change_ratio %.5lf init_filter_num:%d\n",base_num,slow_ratio,change_ratio,init_filter_num);
     if(LevelDB_ConfigMod::getInstance().getStatisticsOpen()){
       options.opEp_.stats_ = leveldb::CreateDBStatistics();
     }

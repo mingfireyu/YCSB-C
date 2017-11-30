@@ -61,6 +61,7 @@ private:
     uint64_t _life_time;
     bool _setFreCountInCompaction;
     int _logBase;
+    int _init_filter_num;
     double _slowRatio;
     double _changeRatio;
 public:
@@ -82,6 +83,7 @@ public:
     uint64_t getLifeTime();
     bool getSetFreCountInCompaction();
     int getLogBase();
+    int getInitFilterNum();
     double getSlowRatio();
     double getChangeRatio();
 };

@@ -51,6 +51,7 @@ void LevelDB_ConfigMod::setConfigPath(const char*path){
     _logBase = readInt("LRU.LogBase");
     _slowRatio = readFloat("LRU.slowRatio");
     _changeRatio = readFloat("LRU.changeRatio");
+    _init_filter_num = readFloat("LRU.initFilterNum");
 }
 /*template<typename T>
 boost::shared_ptr<T> Basic_ConfigMod<T>::instance= nullptr;*/
@@ -153,6 +154,11 @@ double LevelDB_ConfigMod::getSlowRatio(){
 double LevelDB_ConfigMod::getChangeRatio(){
     assert(!_pt.empty());
     return _changeRatio;
+}
+
+int LevelDB_ConfigMod::getInitFilterNum(){
+    assert(!_pt.empty());
+    return _init_filter_num;
 }
 
 template<>
