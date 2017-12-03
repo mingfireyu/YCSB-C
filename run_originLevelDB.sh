@@ -39,7 +39,7 @@ function __runLSM(){
     ltype=$4
     bb=$5
     workloadr_name=./workloads/glsmworkloadr_"$levelIn".spec
-    __modifyConfig directIOFlag true
+    __modifyConfig directIOFlag "$directIOFlag"
     for j in `seq 1 2`
     do
 	let count=300/"$j"
@@ -63,22 +63,28 @@ types=(lsm)
 bloom_bit_array=(6)
 level=6
 dbfilename="$dbfilename""$level"
-maxOpenfiles=55986
-for lsmtype in ${types[@]}
+maxOpenfiles=60000
+directIOFlag=false
+blockCacheSizes=(0) #MB
+for blockCacheSize in ${blockCacheSizes[@]}
 do
-    __modifyConfig bloomType 0
-    __modifyConfig seekCompactionFlag false
-    __modifyConfig maxOpenfiles "$maxOpenfiles"
-    for bloombits in ${bloom_bit_array[@]}
+    let bcs=blockCacheSize*1024*1024
+    __modifyConfig blockCacheSize "$bcs"
+    for lsmtype in ${types[@]}
     do
-	echo bloombits:"$bloombits"
-	__modifyConfig bloomBits  "$bloombits"
-	dirname=/home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian1.1/experiment"$experiment_time"/bloombits"$bloombits"level"$level"/open_files_"$maxOpenfiles"_allfound_300WRead
-	#__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
-	__runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
+	__modifyConfig bloomType 0
+	__modifyConfig seekCompactionFlag false
+	__modifyConfig maxOpenfiles "$maxOpenfiles"
+	for bloombits in ${bloom_bit_array[@]}
+	do
+	    echo bloombits:"$bloombits"
+	    __modifyConfig bloomBits  "$bloombits"
+	    dirname=/home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian0.99/experiment"$experiment_time"/bloombits"$bloombits"level"$level"/open_files_"$maxOpenfiles"_allfound_1000WRead_directIO"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
+	    #__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
+	    __runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" 
+	done
     done
 done
-
 #__runGLSM
 
 

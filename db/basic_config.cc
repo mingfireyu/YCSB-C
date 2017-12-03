@@ -45,7 +45,7 @@ void LevelDB_ConfigMod::setConfigPath(const char*path){
     _bloom_bits_array_filename = readString("basic.bitsArrayFilename");
     _lrus_num = readInt("basic.LRUNum");
     _filters_capacity_ratio = readFloat("basic.FilterCapacityRatio");
-    _blockCacheSize = readSize_t("basic._blockCacheSize");
+    _blockCacheSize = readSize_t("basic.blockCacheSize");
 }
 /*template<typename T>
 boost::shared_ptr<T> Basic_ConfigMod<T>::instance= nullptr;*/
