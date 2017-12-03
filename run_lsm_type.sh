@@ -1,7 +1,7 @@
 #!/bin/bash
-experiment_time=2
+experiment_time=5
 DISK=HDD"$experiment_time"
-dbfilename=/home/ming/RAID0_"$DISK"/hlsm
+dbfilename=/home/ming/RAID0_"$DISK"/hlsmtest
 
 
 function __loadLSM(){
@@ -38,12 +38,13 @@ function __runLSM(){
     fi
 
     workloadr_name=./workloads/glsmworkloadr_"$levelIn".spec
-    for j in `seq 1 4`
+    for j in `seq 1 2`
     do
 	./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true > "$runname"_"$j".txt
 	sync;echo 1 > /proc/sys/vm/drop_caches
 	mv "$runname"_"$j".txt "$dirname"
 	mv testlf.txt "$dirname"/latency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_"$j".txt
+	mv nlf.txt "$dirname"/nlatency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_"$j".txt
         sleep 100s
     done
 }
@@ -70,7 +71,7 @@ function __checkOutBranch(){
 }
 #branches=(lsm)
 types=(lsm-hierarchical)
-bloom_bit_array=(10)
+bloom_bit_array=(8)
 levels=(6)
 for lsmtype in ${types[@]}
 do
@@ -90,7 +91,7 @@ do
 	       echo "lsm-hierarchical"
 	       __modifyConfig bloomFilename /home/ming/workspace/blooml"$level"_"$bloombits"_h1.txt
 	   fi
-	  # __loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian/experiment"$experiment_time"/skipratio2 "$level"  "$lsmtype" "$bloombits"
+	  __loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian/experiment"$experiment_time"/skipratio2 "$level"  "$lsmtype" "$bloombits"
 	   __runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian/experiment"$experiment_time"/skipratio2 "$level"  "$lsmtype" "$bloombits"
 	done
     done
