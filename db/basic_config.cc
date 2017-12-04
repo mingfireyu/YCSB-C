@@ -46,6 +46,7 @@ void LevelDB_ConfigMod::setConfigPath(const char*path){
     _lrus_num = readInt("basic.LRUNum");
     _filters_capacity_ratio = readFloat("basic.FilterCapacityRatio");
     _blockCacheSize = readSize_t("basic.blockCacheSize");
+    _sizeRatio = readInt("basic.sizeRatio");
 }
 /*template<typename T>
 boost::shared_ptr<T> Basic_ConfigMod<T>::instance= nullptr;*/
@@ -121,6 +122,13 @@ size_t LevelDB_ConfigMod::getBlockCacheSize(){
     assert(!_pt.empty());
     return _blockCacheSize;
 }
+
+int LevelDB_ConfigMod::getSizeRatio()
+{
+    assert(!_pt.empty());
+    return _sizeRatio;
+}
+
 
 template<>
 boost::shared_ptr<LevelDB_ConfigMod> Basic_ConfigMod<LevelDB_ConfigMod>::instance = nullptr;	
