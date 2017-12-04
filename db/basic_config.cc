@@ -56,8 +56,9 @@ void LevelDB_ConfigMod::setConfigPath(const char*path){
     _logBase = readInt("LRU.LogBase");
     _slowRatio = readFloat("LRU.slowRatio");
     _changeRatio = readFloat("LRU.changeRatio");
-    _blockCacheSize = readSize_t("basic._blockCacheSize");
     _sizeRatio = readInt("basic._sizeRatio");
+    _init_filter_num = readFloat("LRU.initFilterNum");
+    _blockCacheSize = readSize_t("basic.blockCacheSize");
 }
 /*template<typename T>
 boost::shared_ptr<T> Basic_ConfigMod<T>::instance= nullptr;*/
@@ -162,6 +163,11 @@ double LevelDB_ConfigMod::getChangeRatio(){
     return _changeRatio;
 }
 
+
+int LevelDB_ConfigMod::getInitFilterNum(){
+    assert(!_pt.empty());
+    return _init_filter_num;
+}
 size_t LevelDB_ConfigMod::getBlockCacheSize(){
     assert(!_pt.empty());
     return _blockCacheSize;

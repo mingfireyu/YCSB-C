@@ -28,6 +28,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     bool setFreCountInCompaction = LevelDB_ConfigMod::getInstance().getSetFreCountInCompaction();
     double slow_ratio = LevelDB_ConfigMod::getInstance().getSlowRatio();
     double change_ratio = LevelDB_ConfigMod::getInstance().getChangeRatio();
+    int init_filter_num = LevelDB_ConfigMod::getInstance().getInitFilterNum();
     size_t block_cache_size = LevelDB_ConfigMod::getInstance().getBlockCacheSize();
     int size_ratio = LevelDB_ConfigMod::getInstance().getSizeRatio();
     cout<<"seek compaction flag:";
@@ -101,9 +102,13 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     options.opEp_.setFreCountInCompaction = setFreCountInCompaction;
     options.opEp_.slow_ratio = slow_ratio;
     options.opEp_.change_ratio = change_ratio;
+
     options.opEp_.size_ratio = size_ratio;
+ 
+    options.opEp_.init_filter_nums = init_filter_num;
     options.block_cache = leveldb::NewLRUCache(block_cache_size);
-    fprintf(stderr,"filter_capacity_ratio: %.3lf, slow_ratio %.2lf change_ratio %.5lf block_cache_size %lu size_ratio %d \n",filter_capacity_ratio,slow_ratio,change_ratio,block_cache_size,size_ratio);
+    fprintf(stderr,"filter_capacity_ratio: %.3lf, init_filter_num:%d change_ratio %.5lf block_cache_size %lu MB size_ratio:%d\n",filter_capacity_ratio,init_filter_num,change_ratio,block_cache_size/1024/1024,size_ratio);
+
     if(LevelDB_ConfigMod::getInstance().getStatisticsOpen()){
       options.opEp_.stats_ = leveldb::CreateDBStatistics();
     }
