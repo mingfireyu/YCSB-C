@@ -63,6 +63,7 @@ private:
     int _logBase;
     double _slowRatio;
     double _changeRatio;
+    int _sizeRatio;
     size_t _blockCacheSize;
 public:
     std::string getBloom_filename();
@@ -86,6 +87,7 @@ public:
     double getSlowRatio();
     double getChangeRatio();
     size_t getBlockCacheSize();
+    int getSizeRatio();
 };
 
 #endif
