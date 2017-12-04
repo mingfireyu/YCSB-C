@@ -34,9 +34,9 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     options.compression = compression_Open?leveldb::kSnappyCompression:leveldb::kNoCompression;  //compression is disabled.
     options.max_file_size = max_File_sizes;
     options.max_open_files = max_open_files;
-    /*if(!log_open){
-	
-    }*/
+    if(LevelDB_ConfigMod::getInstance().getStatisticsOpen()){
+	options.stats_ = leveldb::CreateDBStatistics();
+    }
     if(hierarchical_bloom_flag){
 	void *bloom_filename_ptr = (void *)bloom_filename_char;
 	options.filter_policy = leveldb::NewBloomFilterPolicy(bloom_filename_ptr);

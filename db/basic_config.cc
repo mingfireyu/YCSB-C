@@ -31,6 +31,7 @@ void LevelDB_ConfigMod::setConfigPath(const char*path){
     _open_log = readBool("basic.openLog");
     _compression_flag = readBool("basic.compressionFlag");
     _directIO_flag = readBool("basic.directIOFlag");
+    _statistics_open = readBool("basic.statisticsOpen");
 }
 /*template<typename T>
 boost::shared_ptr<T> Basic_ConfigMod<T>::instance= nullptr;*/
@@ -72,6 +73,12 @@ bool LevelDB_ConfigMod::getCompression_flag(){
 bool LevelDB_ConfigMod::getDirectIOFlag(){
     assert(!_pt.empty());
     return _directIO_flag;
+}
+
+bool LevelDB_ConfigMod::getStatisticsOpen()
+{
+   assert(!_pt.empty());
+   return _statistics_open;
 }
 
 template<>
