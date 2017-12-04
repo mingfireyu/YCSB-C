@@ -153,6 +153,10 @@ class CoreWorkload {
   static const std::string SKIPRATIO_INLOAD_PROPERTY_DEFAULT; 
   static const std::string ADJUST_FILTER_PROPERTY;
   static const std::string ADJUST_FILTER_PROPERTY_DEFAULT;
+  static const std::string HOTSPOT_DATA_FRACTION;
+  static const std::string HOTSPOT_DATA_FRACTION_DEFAULT ;
+  static const std::string HOTSPOT_OPN_FRACTION ;
+  static const std::string HOTSPOT_OPN_FRACTION_DEFAULT ;
   static int initCount;
   ///
   /// Initialize the scenario.

@@ -12,7 +12,7 @@
 #include "skewed_latest_generator.h"
 #include "const_generator.h"
 #include "core_workload.h"
-
+#include "HotspotIntegerGenerator.h"
 #include <string>
 
 using ycsbc::CoreWorkload;
@@ -91,7 +91,10 @@ const std::string CoreWorkload::SKIPRATIO_INLOAD_PROPERTY ="skipratioinload";
 const std::string CoreWorkload::SKIPRATIO_INLOAD_PROPERTY_DEFAULT = "0"; 
 const std::string CoreWorkload::ADJUST_FILTER_PROPERTY = "adjustfilter";
 const std::string CoreWorkload::ADJUST_FILTER_PROPERTY_DEFAULT = "false";
-
+const std::string CoreWorkload::HOTSPOT_DATA_FRACTION = "hotspotdatafraction";
+const std::string CoreWorkload::HOTSPOT_DATA_FRACTION_DEFAULT ="0.2";
+const std::string CoreWorkload::HOTSPOT_OPN_FRACTION = "hotspotopnfraction";
+const std::string CoreWorkload::HOTSPOT_OPN_FRACTION_DEFAULT = "0.8";
 int CoreWorkload::initCount = 0;
 
 void CoreWorkload::Init(const utils::Properties &p) {
@@ -205,7 +208,14 @@ void CoreWorkload::Init(const utils::Properties &p) {
   } else if (request_dist == "latest") {
     key_chooser_ = new SkewedLatestGenerator(insert_key_sequence_);
     
-  } else {
+  }else if (request_dist == "hotspot"){
+    double hotsetfraction = std::stod(p.GetProperty(HOTSPOT_DATA_FRACTION,
+		                                 HOTSPOT_DATA_FRACTION_DEFAULT));
+    double hotopnfraction = std::stod(p.GetProperty(HOTSPOT_OPN_FRACTION,
+						 HOTSPOT_OPN_FRACTION_DEFAULT));
+    key_chooser_ = new HotspotIntegerGenerator(0,record_count_ - 1,hotsetfraction,hotopnfraction);   //TODO::new keys
+  } 
+  else {
     throw utils::Exception("Unknown request distribution: " + request_dist);
   }
   

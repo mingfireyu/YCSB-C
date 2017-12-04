@@ -13,7 +13,7 @@
 #include <random>
 #include <algorithm>
 #include <exception>
-
+#include <limits>
 namespace utils {
 
 const uint64_t kFNVOffsetBasis64 = 0xCBF29CE484222325;
@@ -40,6 +40,11 @@ inline double RandomDouble(double min = 0.0, double max = 1.0) {
   return uniform(generator);
 }
 
+inline uint64_t RandomULL(uint64_t min = 0,uint64_t max = 9223372036854775808ULL ){
+      static std::default_random_engine gen1;
+       static std::uniform_int_distribution<uint64_t> uniform1(min,max);
+      return uniform1(gen1);
+}
 ///
 /// Returns an ASCII code that can be printed to desplay
 ///

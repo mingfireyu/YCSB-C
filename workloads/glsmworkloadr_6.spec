@@ -8,7 +8,7 @@
 
 recordcount=2226527455
 #operationcount=1211034
-operationcount=3000000
+operationcount=10000000
 workload=com.yahoo.ycsb.workloads.CoreWorkload
 
 readallfields=true
@@ -19,6 +19,8 @@ scanproportion=0
 insertproportion=0
 fieldlength=76
 requestdistribution=zipfian
+#hotspotdatafraction=0.2
+#hotspotopnfraction=0.8
 
 withtimestamp=false
 timestamptracefilename=trace2.txt
