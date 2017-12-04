@@ -54,6 +54,7 @@ private:
     bool _compression_flag;
     bool _directIO_flag;
     bool _statistics_open;
+    int _size_ratio;
 public:
     std::string getBloom_filename();
     int getMax_open_files();
@@ -65,6 +66,7 @@ public:
     bool getCompression_flag();
     bool getDirectIOFlag();
     bool getStatisticsOpen();
+    int getSizeRatio();
 };
 
 #endif
