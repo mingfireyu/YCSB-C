@@ -38,7 +38,7 @@ function __runLSM(){
     fi
 
     workloadr_name=./workloads/glsmworkloadr_"$levelIn".spec
-    for j in `seq 1 4`
+    for j in `seq 1 2`
     do
 	./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true > "$runname"_"$j".txt
 	sync;echo 1 > /proc/sys/vm/drop_caches

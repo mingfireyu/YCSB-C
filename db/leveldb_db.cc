@@ -19,6 +19,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     options.log_open = log_open;
     bool compression_Open = LevelDB_ConfigMod::getInstance().getCompression_flag();
     bool directIO_flag = LevelDB_ConfigMod::getInstance().getDirectIOFlag();
+    int size_ratio = LevelDB_ConfigMod::getInstance().getSizeRatio();
     //    leveldb::setDirectIOFlag(directIO_flag);
     if(hierarchical_bloom_flag){
 	bloom_filename = LevelDB_ConfigMod::getInstance().getBloom_filename();
@@ -34,9 +35,11 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     options.compression = compression_Open?leveldb::kSnappyCompression:leveldb::kNoCompression;  //compression is disabled.
     options.max_file_size = max_File_sizes;
     options.max_open_files = max_open_files;
-    /*if(!log_open){
-	
-    }*/
+    options.size_ratio = size_ratio;
+    fprintf(stderr,"size ratio:%d \n",size_ratio);
+    if(LevelDB_ConfigMod::getInstance().getStatisticsOpen()){
+	options.stats_ = leveldb::CreateDBStatistics();
+    }
     if(hierarchical_bloom_flag){
 	void *bloom_filename_ptr = (void *)bloom_filename_char;
 	options.filter_policy = leveldb::NewBloomFilterPolicy(bloom_filename_ptr);

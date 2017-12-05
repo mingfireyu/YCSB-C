@@ -39,7 +39,7 @@ protected:
     unsigned long readUL(const char *key);
     std::string readString (const char* key);
     size_t readSize_t(const char* key);
-   
+    
    
 };
 class LevelDB_ConfigMod:public Basic_ConfigMod<LevelDB_ConfigMod>{
@@ -53,6 +53,8 @@ private:
     int _max_file_size;
     bool _compression_flag;
     bool _directIO_flag;
+    bool _statistics_open;
+    int _size_ratio;
 public:
     std::string getBloom_filename();
     int getMax_open_files();
@@ -63,6 +65,8 @@ public:
     void setConfigPath(const char*key);
     bool getCompression_flag();
     bool getDirectIOFlag();
+    bool getStatisticsOpen();
+    int getSizeRatio();
 };
 
 #endif
