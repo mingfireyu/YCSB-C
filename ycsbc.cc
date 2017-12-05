@@ -217,7 +217,24 @@ string ParseCommandLine(int argc, const char *argv[], utils::Properties &props) 
 	}
 	props.SetProperty("skipLoad", argv[argindex]);
         argindex++;
-    }else {
+   }else if(strcmp(argv[argindex],"-requestdistribution") == 0){
+	argindex++;
+	if(argindex >= argc){
+	    UsageMessage(argv[0]);
+	    exit(0);
+	}
+	props.SetProperty("requestdistribution", argv[argindex]);
+        argindex++;
+   }else if(strcmp(argv[argindex],"-zipfianconst") == 0){
+	argindex++;
+	if(argindex >= argc){
+	    UsageMessage(argv[0]);
+	    exit(0);
+	}
+	props.SetProperty("zipfianconst", argv[argindex]);
+        argindex++;
+   }
+   else {
       cout << "Unknown option '" << argv[argindex] << "'" << endl;
       exit(0);
     }
