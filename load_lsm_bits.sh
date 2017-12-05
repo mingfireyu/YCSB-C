@@ -1,7 +1,7 @@
 #!/bin/bash
-experiment_time=4
+experiment_time=6
 DISK=SSD"$experiment_time"
-dbfilename=/home/ming/RAID0_"$DISK"/hlsm
+dbfilename_o=/home/ming/RAID0_"$DISK"/hlsm
 function __loadLSM(){
     rm -rf "$dbfilename"
     loadname=$1
@@ -12,7 +12,7 @@ function __loadLSM(){
     levelIn=$3
     ltype=$4
     bb=$5
-    workloadw_name=./workloads/glsmworkloadw_"$levelIn".spec
+    workloadw_name=./workloads/glsmworkloadw_"$levelIn"_"$sizeRatio".spec
     if [ ! -d "$dirname" ]; then
 	mkdir -p "$dirname"
     fi
@@ -32,7 +32,7 @@ function __runLSM(){
     ltype=$4
     bb=$5
     __modifyConfig directIOFlag true
-    workloadr_name=./workloads/glsmworkloadr_"$levelIn".spec
+    workloadr_name=./workloads/glsmworkloadr_"$levelIn"_"$sizeRatio".spec
     for j in `seq 1 2`
     do
 	./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true > "$runname"_"$j".txt
@@ -68,16 +68,18 @@ function __checkOutBranch(){
 types=(lsm-hierarchical)
 bloom_bit_array=(2)
 level=6
+sizeRatio=2
 for lsmtype in ${types[@]}
 do
-    __checkOutBranch NoSeekCompaction
+#    __checkOutBranch NoSeekCompaction
     __modifyConfig hierarchicalBloomflag true
     for bloombits in ${bloom_bit_array[@]}
     do
 	echo bloombits:"$bloombits"
 	__modifyConfig bloomBits  "$bloombits"
+	__modifyConfig sizeRatio  "$sizeRatio"
 	echo level:"$level"
-	dbfilename="$dbfilename""$level"
+	dbfilename="$dbfilename_o"_l"$level"_b"$bloombits"_s"$sizeRatio"
 	if [ "$lsmtype" = "lsm" ]; then
 	    echo "lsm"
 	    __modifyConfig bloomFilename /home/ming/workspace/blooml"$level"_"$bloombits".txt
@@ -85,8 +87,8 @@ do
 	    echo "lsm-hierarchical"
 	    __modifyConfig bloomFilename /home/ming/workspace/blooml"$level"_"$bloombits"_h1.txt
 	fi
-	__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/workspace/YCSB-C/lsm_"$DISK"_read/skipratio2_zip1.2 "$level"  "$lsmtype" "$bloombits"
-	__runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/workspace/YCSB-C/lsm_"$DISK"_read/skipratio2_zip1.2 "$level"  "$lsmtype" "$bloombits"
+	__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/workspace/YCSB-C/lsm_"$DISK"_read/skipratio2_zip1.2_sizeRatio"$sizeRatio" "$level"  "$lsmtype" "$bloombits"
+#	__runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/workspace/YCSB-C/lsm_"$DISK"_read/skipratio2_zip1.2_sizeRatio"$sizeRatio" "$level"  "$lsmtype" "$bloombits"
 
     done
 done

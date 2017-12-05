@@ -73,7 +73,7 @@ bloom_bit_array=(2)
 level=6
 sizeRatio=2
 requestdistribution=zipfian
-zipfianconst=1.1
+zipfianconst=0.99
 for lsmtype in ${types[@]}
 do
 #    __checkOutBranch NoSeekCompaction
