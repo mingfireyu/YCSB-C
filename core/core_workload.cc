@@ -57,6 +57,10 @@ const string CoreWorkload::REQUEST_DISTRIBUTION_PROPERTY =
     "requestdistribution";
 const string CoreWorkload::REQUEST_DISTRIBUTION_DEFAULT = "uniform";
 
+const string CoreWorkload::ZIPFIAN_CONST="zipfianconst";
+const string CoreWorkload::ZIPFIAN_CONST_DEFAULT="0.99";
+
+
 const string CoreWorkload::MAX_SCAN_LENGTH_PROPERTY = "maxscanlength";
 const string CoreWorkload::MAX_SCAN_LENGTH_DEFAULT = "1000";
 
@@ -184,7 +188,8 @@ void CoreWorkload::Init(const utils::Properties &p) {
     // and pick another key.
     int op_count = std::stoi(p.GetProperty(OPERATION_COUNT_PROPERTY));
     int new_keys = (int)(op_count * insert_proportion * 2); // a fudge factor
-    key_chooser_ = new ScrambledZipfianGenerator(record_count_ + new_keys);
+    double zipfian_const = std::stod(p.GetProperty(ZIPFIAN_CONST,ZIPFIAN_CONST_DEFAULT));
+    key_chooser_ = new ScrambledZipfianGenerator(record_count_ + new_keys,zipfian_const);
     
   } else if (request_dist == "latest") {
     key_chooser_ = new SkewedLatestGenerator(insert_key_sequence_);
