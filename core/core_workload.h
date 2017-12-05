@@ -109,6 +109,8 @@ class CoreWorkload {
   static const std::string REQUEST_DISTRIBUTION_PROPERTY;
   static const std::string REQUEST_DISTRIBUTION_DEFAULT;
   
+  static const std::string ZIPFIAN_CONST;
+ static const std::string ZIPFIAN_CONST_DEFAULT;
   /// 
   /// The name of the property for the max scan length (number of records).
   ///
