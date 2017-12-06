@@ -65,8 +65,8 @@ level=6
 dbfilename="$dbfilename""$level"
 maxOpenfiles=60000
 directIOFlag=true
-blockCacheSizes=(0) #MB
-sizeRatio=2
+blockCacheSizes=(64 128 8) #MB
+sizeRatio=10
 for blockCacheSize in ${blockCacheSizes[@]}
 do
     let bcs=blockCacheSize*1024*1024
@@ -81,7 +81,7 @@ do
 	do
 	    echo bloombits:"$bloombits"
 	    __modifyConfig bloomBits  "$bloombits"
-	    dirname=/home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian1.2/experiment"$experiment_time"/bloombits"$bloombits"level"$level"/open_files_"$maxOpenfiles"_allfound_1000WRead_directIO"$directIOFlag"_blockCacheSize"$blockCacheSize"MB_sizeRatio"$sizeRatio"
+	    dirname=/home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian0.99/experiment"$experiment_time"/bloombits"$bloombits"level"$level"/BIGopen_files_"$maxOpenfiles"_allfound_100WRead_directIO"$directIOFlag"_blockCacheSize"$blockCacheSize"MB_sizeRatio"$sizeRatio"
 	    #__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
 	    __runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" 
 	done

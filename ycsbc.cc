@@ -66,11 +66,19 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
     cout<<"Zero-result lookup: "<<endl;
     cout<<durations[2]/ops[2]<<"us"<<" Zero-result ops: "<<ops[2]<<endl;
     db->doSomeThing("printStats");
+    if(!end_flag_){
+      end_flag_ = true;
+      ycsbc::CoreWorkload nwl;
+      nwl.Init(*props_ptr);
+      cout<<"Adjust bloom filter accroding to access frequencies"<<endl;
+      //      db->doSomeThing();
+      return DelegateClient(db,&nwl,num_ops,is_loading);
+    }
   }else{
     cout<<"Total time of insert: "<<res_time.tv_sec * 1000000 + res_time.tv_usec<<"us"<<endl;
     cout<<"Per insert time: "<<(res_time.tv_sec * 1000000 + res_time.tv_usec)*1.0/num_ops<<"us"<<endl;
   }
-  end_flag_ = true;
+  //  end_flag_ = true;
   db->Close();
   return oks;
 }
