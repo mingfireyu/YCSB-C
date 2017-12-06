@@ -82,7 +82,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
 	    fprintf(fpout,"%d ",bits_per_key_per_filter[i]);
 	}
 	//options.opEp_.lrus_num_ = LevelDB_ConfigMod::getInstance().getLRUsNum();
-	options.opEp_.lrus_num_ = i;
+	options.opEp_.lrus_num_ = i+1;
 	options.filter_policy = leveldb::NewBloomFilterPolicy(bits_per_key_per_filter,bloom_bits);
 	fprintf(stderr,"\n");
 	printf("Counterpart bloom_bits from config:%d\n",bloom_bits);
