@@ -36,6 +36,8 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
   size_t oks = 0;
   std::string out_string;
   int skipratio_inload = wl->skipratio_inload;
+  cerr<<"skipratio_inload"<<skipratio_inload<<endl;
+  cerr<<"num_ops"<<num_ops<<endl;
   struct timeval start_insert_time,end_insert_time,res_time;
   gettimeofday(&start_insert_time,NULL);
   for (size_t i = 0; i < num_ops; ++i) {
@@ -77,7 +79,8 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
     }
   }else{
     cout<<"Total time of insert: "<<res_time.tv_sec * 1000000 + res_time.tv_usec<<"us"<<endl;
-    cout<<"Per insert time: "<<(res_time.tv_sec * 1000000 + res_time.tv_usec)*1.0/num_ops<<"us"<<endl;
+    cerr<<"oks: "<<oks<<endl;
+    cout<<"Per insert time: "<<(res_time.tv_sec * 1000000 + res_time.tv_usec)*1.0/oks<<"us"<<endl;
   }
   end_flag_ = true;
   db->Close();

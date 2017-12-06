@@ -1,7 +1,7 @@
 #!/bin/bash
 experiment_time=6
 DISK=SSD"$experiment_time"
-dbfilename=/home/ming/RAID0_"$DISK"/mlsm
+dbfilename_o=/home/ming/RAID0_"$DISK"/mlsm
 configpath=./configDir/leveldb_config.ini
 section=basic
 
@@ -19,65 +19,95 @@ function __loadLSM(){
     levelIn=$3
     ltype=$4
     bb=$5
-    workloadw_name=./workloads/glsmworkloadw_"$levelIn".spec
+    workloadw_name=./workloads/glsmworkloadw_"$levelIn"_"$sizeRatio".spec
     if [ ! -d "$dirname" ]; then
 	mkdir  -p "$dirname"
     fi
     __modifyConfig directIOFlag false
     ./ycsbc -db leveldb -threads 1 -P $workloadw_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad false > "$loadname"
     sync;echo 1 > /proc/sys/vm/drop_caches
-    sleep 100s
     mv "$loadname" "$dirname"
+    sleep 100s
 }
 
 function __runLSM(){
     runname=$1
-    runname="$runname"_run
+    runname="$runname"
     dirname=$2
     levelIn=$3
     ltype=$4
     bb=$5
-    workloadr_name=./workloads/glsmworkloadr_"$levelIn".spec
-    base_nums=(16 32)
-    life_times=(100 200 300 400 500)
-    __modifyConfig directIOFlag false
+    cR=$6
+    workloadr_name=./workloads/glsmworkloadr_"$levelIn"_"$sizeRatio".spec
+    life_times=(10000)
+    __modifyConfig directIOFlag "$directIOFlag"
+    section=LRU
     if [ ! -d "$dirname" ]; then
 	mkdir  -p "$dirname"
     fi
-    for base_num in ${base_nums[@]}
-     do
-	echo Base_Num "$base_num"
-	section=LRU
-	__modifyConfig BaseNum "$base_num"
-        ./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true > "$runname"_base"$base_num".txt
+    section=LRU
+    for life_time in ${life_times[@]}
+    do
+	echo life_time "$life_time"
+	__modifyConfig LifeTime "$life_time"
+        ./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true -requestdistribution "$requestdistribution" -zipfianconst "$zipfianconst" > "$runname"_changeRatio"$cR"_lifetime"$life_time".txt
 	sync;echo 1 > /proc/sys/vm/drop_caches
-	mv "$runname"_base"$base_num".txt "$dirname"
-	mv testlf1.txt "$dirname"/latency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_base"$base_num".txt
-	mv level?_filter_count_?.txt "$dirname"/
+	mv "$runname"_changeRatio"$cR"_lifetime"$life_time".txt "$dirname"/
+	mv testlf1.txt "$dirname"/latency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_changeRatio"$cR"_lifetime"$life_time".txt
+	mv nlf1.txt "$dirname"/nlatency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_changeRatio"$cR"_lifetime"$life_time".txt
+	mv level?_access_frequencies.txt "$dirname"/
         sleep 100s
     done
     cp configDir/leveldb_config.ini "$dirname"/
+    section=basic
 }
 
 
-types=(lsm)
-bloom_bit_array=(6)
+lsmtype=(lsm)
+bloombits=6
 level=6
-dbfilename="$dbfilename""$level"
-for lsmtype in ${types[@]}
+sizeRatio=2
+dbfilename="$dbfilename_o"l"$level"s"$sizeRatio"b"$bloombits"
+FilterCapacityRatios=(6.0)
+blockCacheSizes=(0) #MB
+changeRatios=(0.001 0.0001)
+initFilterNum=2
+directIOFlag=true
+requestdistribution=uniform
+zipfianconst=1.1
+for blockCacheSize in ${blockCacheSizes[@]}
 do
-    __modifyConfig bloomType 2
-    __modifyConfig seekCompactionFlag false
-    for bloombits in ${bloom_bit_array[@]}
+    let bcs=blockCacheSize*1024*1024
+    __modifyConfig blockCacheSize "$bcs" 
+    __modifyConfig sizeRatio "$sizeRatio"
+    for FilterCapacityRatio in ${FilterCapacityRatios[@]}
     do
+	__modifyConfig bloomType 2
+	__modifyConfig seekCompactionFlag false
 	echo Counterpart bloombits:"$bloombits"
+
 	__modifyConfig bloomBits  "$bloombits"
-	dirname=/home/ming/workspace/YCSB-C/lsm_"$DISK"_read_zipfian1.1_multi_filter/Base_num_test
-	__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
-	__runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
+	section=LRU
+	__modifyConfig FilterCapacityRatio "$FilterCapacityRatio"
+	__modifyConfig initFilterNum "$initFilterNum"
+	section=basic
+	for changeRatio in ${changeRatios[@]}
+	do
+	    section=LRU
+	    __modifyConfig changeRatio "$changeRatio"
+	    section=basic
+	    if [ "$requestdistribution" = "zipfian" ]; then
+		echo "zipfian"
+		dirname=/home/ming/experiment/expectation/lsm_"$DISK"_read_"$requestdistribution""$zipfianconst"_multi_filter/experiment"$experiment_time"/FilterCapacityRatio_"$FilterCapacityRatio"_lru0_100WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
+	    else
+		echo "$requestdistribution"
+		dirname=/home/ming/experiment/expectation/lsm_"$DISK"_read_"$requestdistribution"_multi_filter/experiment"$experiment_time"/FilterCapacityRatio_"$FilterCapacityRatio"_lru0_100WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
+	    fi
+	    __loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
+	    __runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" "$changeRatio"
+	done
     done
 done
-
 #__runGLSM
 
 

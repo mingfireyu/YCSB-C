@@ -1,6 +1,7 @@
 #!/bin/bash
 experiment_time=6
 DISK=SSD"$experiment_time"
+#dbfilename=/home/ming/RAID0_"$DISK"/mlsm_336666bits
 dbfilename=/home/ming/RAID0_"$DISK"/mlsm
 configpath=./configDir/leveldb_config.ini
 section=basic
@@ -39,8 +40,8 @@ function __runLSM(){
     bb=$5
     workloadr_name=./workloads/glsmworkloadr_"$levelIn".spec
     base_nums=(8)
-    life_times=(25000)
-    slow_ratios=0.9
+    life_times=(20000)
+    slow_ratios=0.7
     __modifyConfig directIOFlag true
     section=LRU
     __modifyConfig slowRatio "$slow_ratios"
@@ -75,7 +76,7 @@ bloombits=6
 level=6
 dbfilename="$dbfilename""$level"
 FilterCapacityRatios=(6)
-logbases=(3)
+logbases=(5)
 
 for FilterCapacityRatio in ${FilterCapacityRatios[@]}
 do
@@ -91,7 +92,7 @@ do
 	section=LRU
 	__modifyConfig LogBase "$logbase"
 	section=basic
-	dirname=/home/ming/experiment/lsm_"$DISK"_read_zipfian0.99_multi_filter/experiment"$experiment_time"/BGShrinkUsage_FilterCapacityRatio_"$FilterCapacityRatio"_logbase_"$logbase"lru0_300WRead
+	dirname=/home/ming/experiment/expectation/lsm_"$DISK"_read_zipfian0.99_multi_filter/experiment"$experiment_time"/BGShrinkUsage_FilterCapacityRatio_"$FilterCapacityRatio"_logbase_"$logbase"lru0_300WRead
 	#__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
 	__runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
     done

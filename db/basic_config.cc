@@ -56,7 +56,7 @@ void LevelDB_ConfigMod::setConfigPath(const char*path){
     _logBase = readInt("LRU.LogBase");
     _slowRatio = readFloat("LRU.slowRatio");
     _changeRatio = readFloat("LRU.changeRatio");
-    _sizeRatio = readInt("basic._sizeRatio");
+    _sizeRatio = readInt("basic.sizeRatio");
     _init_filter_num = readFloat("LRU.initFilterNum");
     _blockCacheSize = readSize_t("basic.blockCacheSize");
 }
