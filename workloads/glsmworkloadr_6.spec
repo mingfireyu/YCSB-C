@@ -6,9 +6,9 @@
 #   Default data size: 1 KB records (10 fields, 100 bytes each, plus key)
 #   Request distribution: zipfian
 
-recordcount=2226527455
+recordcount=4453054910
 #operationcount=1211034
-operationcount=3000000
+operationcount=1000000
 workload=com.yahoo.ycsb.workloads.CoreWorkload
 
 readallfields=true
@@ -23,8 +23,9 @@ requestdistribution=zipfian
 withtimestamp=false
 timestamptracefilename=trace2.txt
 withoperation=false
-
+#hotspotdatafraction=0.2
+#hotspotopnfraction=0.8
 withlatency=true
 latencyfilename=testlf
-adjustfilter=false
+adjustfilter=true
 skipratioinload=2

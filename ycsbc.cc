@@ -67,14 +67,14 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
     cout<<durations[ycsbc::Operation::READ]/ops[ycsbc::Operation::READ]<<"us"<<" Read ops: "<<ops[ycsbc::Operation::READ]<<endl;
     cout<<"Zero-result lookup: "<<endl;
     cout<<durations[2]/ops[2]<<"us"<<" Zero-result ops: "<<ops[2]<<endl;
-    db->doSomeThing("printAccessFreq");
+    //db->doSomeThing("printAccessFreq");
     db->doSomeThing("printStats");
     if(wl->adjust_filter_&&!end_flag_){
       end_flag_ = true;
       ycsbc::CoreWorkload nwl;
       nwl.Init(*props_ptr);
       cout<<"Adjust bloom filter accroding to access frequencies"<<endl;
-      db->doSomeThing();
+      //db->doSomeThing();
       return DelegateClient(db,&nwl,num_ops,is_loading);
     }
   }else{
