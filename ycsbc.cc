@@ -75,8 +75,9 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
       return DelegateClient(db,&nwl,num_ops,is_loading);
     }
   }else{
+    cerr<<"oks = " << oks<<endl;
     cout<<"Total time of insert: "<<res_time.tv_sec * 1000000 + res_time.tv_usec<<"us"<<endl;
-    cout<<"Per insert time: "<<(res_time.tv_sec * 1000000 + res_time.tv_usec)*1.0/num_ops<<"us"<<endl;
+    cout<<"Per insert time: "<<(res_time.tv_sec * 1000000 + res_time.tv_usec)*1.0/oks<<"us"<<endl;
   }
   //  end_flag_ = true;
   db->Close();
@@ -232,7 +233,23 @@ string ParseCommandLine(int argc, const char *argv[], utils::Properties &props) 
 	}
 	props.SetProperty("skipLoad", argv[argindex]);
         argindex++;
-    }else {
+    }else if(strcmp(argv[argindex],"-requestdistribution") == 0){
+	argindex++;
+	if(argindex >= argc){
+	    UsageMessage(argv[0]);
+	    exit(0);
+	}
+	props.SetProperty("requestdistribution", argv[argindex]);
+        argindex++;
+   }else if(strcmp(argv[argindex],"-zipfianconst") == 0){
+	argindex++;
+	if(argindex >= argc){
+	    UsageMessage(argv[0]);
+	    exit(0);
+	}
+	props.SetProperty("zipfianconst", argv[argindex]);
+        argindex++;
+   }else {
       cout << "Unknown option '" << argv[argindex] << "'" << endl;
       exit(0);
     }
