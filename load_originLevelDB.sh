@@ -65,7 +65,8 @@ level=6
 maxOpenfiles=60000
 directIOFlag=true
 blockCacheSizes=(0) #MB
-sizeRatio=10
+sizeRatio=2
+loadTime=0
 requestdistribution=zipfian
 zipfianconst=0.99
 for blockCacheSize in ${blockCacheSizes[@]}
@@ -89,6 +90,10 @@ do
 	    else
 		echo "$requestdistribution"
 		dirname=/home/ming/workspace/YCSB-C/lsm_"$DISK"_read_"$requestdistribution"/experiment"$experiment_time"/bloombits"$bloombits"level"$level"/open_files_"$maxOpenfiles"_allfound_1000WRead_directIO"$directIOFlag"_blockCacheSize"$blockCacheSize"MB_sizeRatio"$sizeRatio"
+	    fi
+	    if test $loadTime -eq 0; then
+		loadTime=1
+		__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
 	    fi
 	    __runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" 
 	done
