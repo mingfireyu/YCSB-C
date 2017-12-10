@@ -38,6 +38,8 @@ function __runLSM(){
     ltype=$4
     bb=$5
     cR=$6
+    cachesize=$7
+    zipfian=$8
     workloadr_name=./workloads/glsmworkloadr_"$levelIn".spec
     life_times=(10000)
     __modifyConfig directIOFlag "$directIOFlag"
@@ -52,6 +54,7 @@ function __runLSM(){
 	__modifyConfig LifeTime "$life_time"
         ./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true -requestdistribution "$requestdistribution" -zipfianconst "$zipfianconst" > "$runname"_changeRatio"$cR"_lifetime"$life_time".txt
 	sync;echo 1 > /proc/sys/vm/drop_caches
+        python ./getStatistics.py "$runname"_changeRatio"$cR"_lifetime"$life_time".txt /home/ming/statistics/zipf"$zipfian"_cache"$cachesize"MB/  
 	mv "$runname"_changeRatio"$cR"_lifetime"$life_time".txt "$dirname"/
 	mv testlf1.txt "$dirname"/latency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_changeRatio"$cR"_lifetime"$life_time".txt
 	mv nlf1.txt "$dirname"/nlatency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_changeRatio"$cR"_lifetime"$life_time".txt
@@ -70,12 +73,12 @@ sizeRatio=10
 #dbfilename="$dbfilename_o"l"$level"s"$sizeRatio"b"$bloombits"
 dbfilename="$dbfilename_o""$level"
 FilterCapacityRatios=(6.0)
-blockCacheSizes=(64 128) #MB
+blockCacheSizes=(16 32 64) #MB
 changeRatios=(0.0001)
 initFilterNum=3
 directIOFlag=true
 requestdistribution=zipfian
-zipfianconst=0.99
+zipfianconst=1.10
 bitsArrayFilename=/home/ming/workspace/bitsArray444666.txt
 __modifyConfig bitsArrayFilename "$bitsArrayFilename"
 for blockCacheSize in ${blockCacheSizes[@]}
@@ -101,13 +104,13 @@ do
 	    section=basic
 	    if [ "$requestdistribution" = "zipfian" ]; then
 		echo "zipfian"
-		dirname=/home/ming/experiment/expectation/lsm_"$DISK"_read_"$requestdistribution""$zipfianconst"_multi_filter/experiment"$experiment_time"/FilterCapacityRatio_"$FilterCapacityRatio"_lru0_100WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
+		dirname=/home/ming/experiment/expectation/lsm_"$DISK"_read_"$requestdistribution""$zipfianconst"_multi_filter/experiment"$experiment_time"/record2/BIGFilterCapacityRatio_"$FilterCapacityRatio"_lru0_100WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
 	    else
 		echo "$requestdistribution"
 		dirname=/home/ming/experiment/expectation/lsm_"$DISK"_read_"$requestdistribution"_multi_filter/experiment"$experiment_time"/BIGFilterCapacityRatio_"$FilterCapacityRatio"_lru0_100WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
 	    fi
 	    #__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
-	    __runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" "$changeRatio"
+	    __runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" "$changeRatio" "$blockCacheSize" "$zipfianconst"
 	done
     done
 done
