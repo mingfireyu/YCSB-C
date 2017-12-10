@@ -31,6 +31,8 @@ public :
   int Delete(const std::string &table, const std::string &key);
    virtual ~LevelDB();
   void Close();
+  virtual void doSomeThing(const char *thing_str="printStats");
+
 private:
     leveldb::DB *db_;
 };

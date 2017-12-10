@@ -23,6 +23,7 @@ void UsageMessage(const char *command);
 bool StrStartWith(const char *str, const char *pre);
 string ParseCommandLine(int argc, const char *argv[], utils::Properties &props);
 bool end_flag_ = false;
+utils::Properties *props_ptr = NULL;
 
 size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_ops,
     bool is_loading) {
@@ -59,12 +60,20 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
     cout<<durations[ycsbc::Operation::READ]/ops[ycsbc::Operation::READ]<<"us"<<"Read ops:"<<ops[ycsbc::Operation::READ]<<endl;
     cout<<"Zero-result lookup: "<<endl;
     cout<<durations[2]/ops[2]<<"us"<<" Zero-result ops: "<<ops[2]<<endl;
+    db->doSomeThing("printStats");
+    if(!end_flag_){
+      end_flag_ = true;
+      ycsbc::CoreWorkload nwl;
+      nwl.Init(*props_ptr);
+      cerr<<"call again"<<endl;
+      return DelegateClient(db,&nwl,num_ops,is_loading);
+    }
   }else{
     cout<<"Total time of insert: "<<res_time.tv_sec * 1000000 + res_time.tv_usec<<"us"<<endl;
     cerr<<"num_ops: "<<num_ops<<"oks: "<<oks<<endl;
     cout<<"Per insert time: "<<(res_time.tv_sec * 1000000 + res_time.tv_usec)*1.0/oks<<"us"<<endl;
   }
-  end_flag_ = true;
+
   db->Close();
   return oks;
 }
@@ -81,7 +90,7 @@ int main(const int argc, const char *argv[]) {
 
   ycsbc::CoreWorkload wl;
   wl.Init(props);
-
+  props_ptr = &props;
   const size_t num_threads = static_cast<int>(stoi(props.GetProperty("threadcount", "1")));
   bool skipLoad = utils::StrToBool(props.GetProperty("skipLoad",
 						   "false"));

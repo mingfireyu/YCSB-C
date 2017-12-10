@@ -122,6 +122,16 @@ LevelDB::~LevelDB()
     delete db_;
 }
 
+void LevelDB::doSomeThing(const char* thing_str)
+{
+    if(strncmp(thing_str,"printStats",strlen("printStats")) == 0){
+      std::string stat_str;
+      db_->GetProperty("leveldb.stats",&stat_str);
+      cout<<stat_str<<endl;
+    }
+}
+
+  
 
 
 
