@@ -27,6 +27,7 @@ withoperation=false
 
 
 withlatency=true
-latencyfilename=testlf.txt
+latencyfilename=testlf
+adjustfilter=true
 skipratioinload=2
 
