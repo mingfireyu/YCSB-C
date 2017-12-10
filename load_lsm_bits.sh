@@ -87,8 +87,8 @@ do
 	    echo "lsm-hierarchical"
 	    __modifyConfig bloomFilename /home/ming/workspace/blooml"$level"_"$bloombits"_h1.txt
 	fi
-	__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/workspace/YCSB-C/lsm_"$DISK"_read/skipratio2_zip1.2_sizeRatio"$sizeRatio" "$level"  "$lsmtype" "$bloombits"
-#	__runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/workspace/YCSB-C/lsm_"$DISK"_read/skipratio2_zip1.2_sizeRatio"$sizeRatio" "$level"  "$lsmtype" "$bloombits"
+#	__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/workspace/YCSB-C/lsm_"$DISK"_read/skipratio2_zip1.2_sizeRatio"$sizeRatio" "$level"  "$lsmtype" "$bloombits"
+	__runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/workspace/YCSB-C/lsm_"$DISK"_read/skipratio2_zip1.2_sizeRatio"$sizeRatio" "$level"  "$lsmtype" "$bloombits"
 
     done
 done
