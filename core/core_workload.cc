@@ -120,6 +120,9 @@ void CoreWorkload::Init(const utils::Properties &p) {
       READMODIFYWRITE_PROPORTION_PROPERTY, READMODIFYWRITE_PROPORTION_DEFAULT));
   
   sscanf(p.GetProperty(RECORD_COUNT_PROPERTY).c_str(),"%zu",&record_count_);
+  int field_len = std::stoi(p.GetProperty(FIELD_LENGTH_PROPERTY,
+                                          FIELD_LENGTH_DEFAULT));
+  
   std::string request_dist = p.GetProperty(REQUEST_DISTRIBUTION_PROPERTY,
                                            REQUEST_DISTRIBUTION_DEFAULT);
   int max_scan_len = std::stoi(p.GetProperty(MAX_SCAN_LENGTH_PROPERTY,
@@ -128,6 +131,8 @@ void CoreWorkload::Init(const utils::Properties &p) {
                                             SCAN_LENGTH_DISTRIBUTION_DEFAULT);
   int insert_start = std::stoi(p.GetProperty(INSERT_START_PROPERTY,
                                              INSERT_START_DEFAULT));
+  
+  
   
   read_all_fields_ = utils::StrToBool(p.GetProperty(READ_ALL_FIELDS_PROPERTY,
                                                     READ_ALL_FIELDS_DEFAULT));
@@ -169,6 +174,11 @@ void CoreWorkload::Init(const utils::Properties &p) {
                                 SKIPRATIO_INLOAD_PROPERTY_DEFAULT));
   adjust_filter_ = utils::StrToBool(p.GetProperty(ADJUST_FILTER_PROPERTY,
 						  ADJUST_FILTER_PROPERTY_DEFAULT));
+  if(skipratio_inload != 0){
+	fprintf(stderr,"load  a %lu MB database or running on a %lu MB database",field_len*record_count_/skipratio_inload/1024/1024,field_len*record_count_/1024/1024);
+  }else{
+	fprintf(stderr,"load or running a %lu MB database",field_len*record_count_/1024/1024);
+  }
   if (p.GetProperty(INSERT_ORDER_PROPERTY, INSERT_ORDER_DEFAULT) == "hashed") {
     ordered_inserts_ = false;
   } else {
