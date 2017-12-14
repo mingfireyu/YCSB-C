@@ -40,6 +40,7 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
   for (size_t i = 0; i < num_ops; ++i) {
     if (is_loading) {
       if(skipratio_inload&&i%skipratio_inload!=0){
+	client.DoInsert(false);
  	continue;
       }
       oks += client.DoInsert();
