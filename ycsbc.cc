@@ -61,9 +61,9 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
   cout<<endl;
   if(!is_loading){
     cout<<"WRITE latency"<<endl;
-    cout<<durations[ycsbc::Operation::INSERT]/ops[ycsbc::Operation::INSERT]<<"us"<<"Write ops:"<<ops[ycsbc::Operation::INSERT]<<endl;
+    cout<<durations[ycsbc::Operation::INSERT]/ops[ycsbc::Operation::INSERT]<<"us "<<"Write ops: "<<ops[ycsbc::Operation::INSERT]<<endl;
     cout<<"READ latency"<<endl;
-    cout<<durations[ycsbc::Operation::READ]/ops[ycsbc::Operation::READ]<<"us"<<"Read ops:"<<ops[ycsbc::Operation::READ]<<endl;
+    cout<<durations[ycsbc::Operation::READ]/ops[ycsbc::Operation::READ]<<"us "<<"Read ops: "<<ops[ycsbc::Operation::READ]<<endl;
     cout<<"Zero-result lookup: "<<endl;
     cout<<durations[2]/ops[2]<<"us"<<" Zero-result ops: "<<ops[2]<<endl;
     db->doSomeThing("printStats");
