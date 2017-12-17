@@ -43,7 +43,8 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
   for (size_t i = 0; i < num_ops; ++i) {
     if (is_loading) {
       if(skipratio_inload&&i%skipratio_inload!=0){
- 	continue;
+	client.DoInsert(false);
+	continue;
       }
       oks += client.DoInsert();
     } else {
@@ -67,9 +68,10 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
     cout<<durations[ycsbc::Operation::READ]/ops[ycsbc::Operation::READ]<<"us"<<" Read ops: "<<ops[ycsbc::Operation::READ]<<endl;
     cout<<"Zero-result lookup: "<<endl;
     cout<<durations[2]/ops[2]<<"us"<<" Zero-result ops: "<<ops[2]<<endl;
-    //db->doSomeThing("printAccessFreq");
     db->doSomeThing("printStats");
+    //    db->doSomeThing("printAccessFreq");
     if(wl->adjust_filter_&&!end_flag_){
+      db->doSomeThing("printAccessFreq");
       end_flag_ = true;
       ycsbc::CoreWorkload nwl;
       nwl.Init(*props_ptr);

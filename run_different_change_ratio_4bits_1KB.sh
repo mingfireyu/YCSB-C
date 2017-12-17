@@ -70,15 +70,17 @@ level=6
 sizeRatio=10
 dbfilename="$dbfilename_o"l"$level"s"$sizeRatio"b"$bloombits"
 FilterCapacityRatios=(4.0)
-blockCacheSizes=(64 32) #MB
+blockCacheSizes=(0 32 48 64) #MB
 changeRatios=(0.0001)
 initFilterNum=2
 directIOFlag=true
 requestdistribution=zipfian
-zipfianconst=1.10
+zipfianconst=1.20
+maxOpenfiles=56160
 echo "$dbfilename"
 bitsArrayFilename=/home/ming/workspace/bitsArray355555.txt
 __modifyConfig bitsArrayFilename "$bitsArrayFilename"
+__modifyConfig maxOpenfiles "$maxOpenfiles"
 for blockCacheSize in ${blockCacheSizes[@]}
 do
     let bcs=blockCacheSize*1024*1024

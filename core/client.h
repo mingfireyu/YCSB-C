@@ -102,7 +102,7 @@ class Client {
 	first_do_transaction = false;
   }
   
-  virtual bool DoInsert();
+  virtual bool DoInsert(bool insert_real=true);
   virtual bool DoTransaction(size_t ops[],double durations[]);
   
   virtual ~Client() { 
@@ -133,11 +133,15 @@ class Client {
   FILE *nlatency_fp_;
 };
 
-inline bool Client::DoInsert() {
+inline bool Client::DoInsert(bool insert_real) {
   std::string key = workload_.NextSequenceKey();
   std::vector<DB::KVPair> pairs;
   workload_.BuildValues(pairs);
-  return (db_.Insert(workload_.NextTable(), key, pairs) == DB::kOK);
+  if(insert_real){
+    return (db_.Insert(workload_.NextTable(), key, pairs) == DB::kOK);
+  }
+  workload_.NextTable();
+  return DB::kOK;
 }
 
 
