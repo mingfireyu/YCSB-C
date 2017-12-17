@@ -60,6 +60,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     leveldb::Status status = leveldb::DB::Open(options,dbfilename, &db_);
     if(!status.ok()){
 	fprintf(stderr,"can't open leveldb\n");
+	cerr<<status.ToString()<<endl;
 	exit(0);
     }
 }
