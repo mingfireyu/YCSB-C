@@ -40,6 +40,7 @@ void *ReportInLoop(void *arg){
   for(int i = 0 ; i < 2 ; i++){
     if(f_ops[i]){
       fclose(f_ops[i]);
+      f_ops[i] = NULL;
     }
   }
   return NULL;
