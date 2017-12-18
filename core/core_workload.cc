@@ -175,9 +175,9 @@ void CoreWorkload::Init(const utils::Properties &p) {
   adjust_filter_ = utils::StrToBool(p.GetProperty(ADJUST_FILTER_PROPERTY,
 						  ADJUST_FILTER_PROPERTY_DEFAULT));
   if(skipratio_inload != 0){
-    fprintf(stderr,"load  a %lu MB database or running on a %lu MB database",(field_len+24)*record_count_/skipratio_inload/1024/1024,(field_len+24)*record_count_/1024/1024);
+    fprintf(stderr,"load  a %lu MB database or running on a %lu MB database\n",(field_len+24)*record_count_/skipratio_inload/1024/1024,(field_len+24)*record_count_/1024/1024);
   }else{
-    fprintf(stderr,"load or running a %lu MB database",(field_len+24)*record_count_/1024/1024);
+    fprintf(stderr,"load or running a %lu MB database\n",(field_len+24)*record_count_/1024/1024);
   }
   if (p.GetProperty(INSERT_ORDER_PROPERTY, INSERT_ORDER_DEFAULT) == "hashed") {
     ordered_inserts_ = false;
