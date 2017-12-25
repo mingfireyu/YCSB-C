@@ -19,7 +19,7 @@ function __loadLSM(){
     levelIn=$3
     ltype=$4
     bb=$5
-    workloadw_name=./workloads/glsmworkloadw_"$levelIn"_b"$bb"_"$sizeRatio"_"$value_size".spec
+    workloadw_name=./workloads/glsmworkloadw_"$levelIn"_"$sizeRatio"_"$value_size".spec
     echo workloadname:"$workloadw_name"
     __modifyConfig directIOFlag false
     ./ycsbc -db leveldb -threads 1 -P $workloadw_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad false > "$loadname"
@@ -39,7 +39,7 @@ function __runLSM(){
     levelIn=$3
     ltype=$4
     bb=$5
-    workloadr_name=./workloads/glsmworkloadr_"$levelIn"_b"$bb"_"$sizeRatio"_"$value_size".spec
+    workloadr_name=./workloads/glsmworkloadr_"$levelIn"_"$sizeRatio"_"$value_size".spec
     echo workloadrname:"$workloadr_name"
     __modifyConfig directIOFlag "$directIOFlag"
     for j in `seq 1 2`
@@ -65,7 +65,7 @@ types=(lsm)
 bloom_bit_array=(4)
 level=6
 maxOpenfiles=60000
-directIOFlag=true
+directIOFlag=false
 blockCacheSizes=(32 64) #MB
 sizeRatio=10
 requestdistribution=zipfian
