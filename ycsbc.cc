@@ -34,7 +34,7 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
   size_t oks = 0;
   std::string out_string;
   int skipratio_inload = wl->skipratio_inload;
-  size_t offset=100000;
+  size_t offset=0;
   struct timeval start_insert_time,end_insert_time,res_time;
   cerr<<"skipratio_inload"<<skipratio_inload<<endl;
   gettimeofday(&start_insert_time,NULL);
