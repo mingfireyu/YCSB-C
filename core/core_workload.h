@@ -233,6 +233,7 @@ inline std::string CoreWorkload::BuildKeyName(uint64_t key_num) {
   if (!ordered_inserts_) {
     key_num = utils::Hash(key_num);
   }
+  key_num %= insert_key_sequence_.Last();
   snprintf(key, sizeof(key), "%020lu", key_num);
   return std::string("user").append(std::string(key,20));
 }

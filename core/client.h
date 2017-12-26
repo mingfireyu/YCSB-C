@@ -100,7 +100,7 @@ class Client {
   }
   
   virtual bool DoInsert(bool insert_real=true);
-  virtual bool DoTransaction(size_t ops[],double durations[]);
+  virtual bool DoTransaction(size_t ops[],double durations[],bool do_real=true);
   
   virtual ~Client() { 
       if(latency_fp_){
@@ -111,7 +111,7 @@ class Client {
   
  protected:
   
-  virtual int TransactionRead();
+  virtual int TransactionRead(bool do_real);
   virtual int TransactionReadModifyWrite();
   virtual int TransactionScan();
   virtual int TransactionUpdate();
@@ -142,7 +142,7 @@ inline bool Client::DoInsert(bool insert_real) {
 }
 
 
-inline bool Client::DoTransaction(size_t ops[],double durations[]) {
+inline bool Client::DoTransaction(size_t ops[],double durations[],bool do_real) {
   int status = -1;
   unsigned long long latency;
   if(!first_do_transaction){
@@ -164,19 +164,21 @@ inline bool Client::DoTransaction(size_t ops[],double durations[]) {
   ycsbc::Operation operations = current_operation_ == nullptr ?workload_.NextOperation():*current_operation_;
   switch (operations) {
     case READ:
-      status = TransactionRead();
+      status = TransactionRead(do_real);
       latency = transaction_timer.elapsed();
-      durations[READ] += latency;
-      if(latency_fp_  != NULL){
+      if(do_real){
+	durations[READ] += latency;
+	if(latency_fp_  != NULL){
 	  if(status == DB::kOK){
 	    fprintf(latency_fp_,"%llu,",latency);
 	  }else if(status == DB::kErrorNoData){
-	     fprintf(nlatency_fp_,"%llu,",latency);
-	     ops[2]++;
-	     durations[2] += latency;
+	    fprintf(nlatency_fp_,"%llu,",latency);
+	    ops[2]++;
+	    durations[2] += latency;
 	  }
+	}
+	ops[READ]++;
       }
-      ops[READ]++;
       break;
     case UPDATE:
       status = TransactionUpdate();
@@ -201,16 +203,22 @@ inline bool Client::DoTransaction(size_t ops[],double durations[]) {
   return (status == DB::kOK);
 }
 
-inline int Client::TransactionRead() {
+inline int Client::TransactionRead(bool do_real) {
   const std::string &table = workload_.NextTable();
   const std::string &key = workload_.NextTransactionKey();
   std::vector<DB::KVPair> result;
   if (!workload_.read_all_fields()) {
     std::vector<std::string> fields;
     fields.push_back("field" + workload_.NextFieldName());
-    return db_.Read(table, key, &fields, result);
+    if(do_real){
+      return db_.Read(table, key, &fields, result);
+    }
+    return DB::kOK;
   } else {
-    return db_.Read(table, key, NULL, result);
+    if(do_real){
+      return db_.Read(table, key, NULL, result);
+    }
+    return DB::kOK;
   }
 }
 

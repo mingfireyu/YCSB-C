@@ -34,10 +34,11 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
   size_t oks = 0;
   std::string out_string;
   int skipratio_inload = wl->skipratio_inload;
+  size_t offset=100000;
   struct timeval start_insert_time,end_insert_time,res_time;
   cerr<<"skipratio_inload"<<skipratio_inload<<endl;
   gettimeofday(&start_insert_time,NULL);
-  for (size_t i = 0; i < num_ops; ++i) {
+  for (size_t i = 0; i < num_ops+offset; ++i) {
     if (is_loading) {
       if(skipratio_inload&&i%skipratio_inload!=0){
 	client.DoInsert(false);
@@ -45,6 +46,10 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
       }
       oks += client.DoInsert();
     } else {
+      if(i < offset){
+	oks += client.DoTransaction(ops,durations,false);
+	continue;
+      }
       oks += client.DoTransaction(ops,durations);
     }
     if(i%10000 == 0){
