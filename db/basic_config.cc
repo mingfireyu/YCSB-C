@@ -33,6 +33,7 @@ void LevelDB_ConfigMod::setConfigPath(const char*path){
     _directIO_flag = readBool("basic.directIOFlag");
     _statistics_open = readBool("basic.statisticsOpen");
     _size_ratio = readInt("basic.sizeRatio");
+    _block_cache_size = readSize_t("basic.blockCacheSize");
 }
 /*template<typename T>
 boost::shared_ptr<T> Basic_ConfigMod<T>::instance= nullptr;*/
@@ -74,6 +75,11 @@ bool LevelDB_ConfigMod::getCompression_flag(){
 bool LevelDB_ConfigMod::getDirectIOFlag(){
     assert(!_pt.empty());
     return _directIO_flag;
+}
+
+size_t LevelDB_ConfigMod::getBlockCacheSize() {
+    assert(!_pt.empty());
+    return _block_cache_size;
 }
 
 bool LevelDB_ConfigMod::getStatisticsOpen()

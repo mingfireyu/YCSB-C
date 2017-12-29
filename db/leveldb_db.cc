@@ -2,6 +2,7 @@
 #include <cstring>
 #include"basic_config.hh"
 #include<iostream>
+#include <leveldb/cache.h>
 using namespace std;
 
 namespace ycsbc {
@@ -20,6 +21,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     bool compression_Open = LevelDB_ConfigMod::getInstance().getCompression_flag();
     bool directIO_flag = LevelDB_ConfigMod::getInstance().getDirectIOFlag();
     int size_ratio = LevelDB_ConfigMod::getInstance().getSizeRatio();
+    size_t blockCacheSize = LevelDB_ConfigMod::getInstance().getBlockCacheSize();
     //    leveldb::setDirectIOFlag(directIO_flag);
     if(hierarchical_bloom_flag){
 	bloom_filename = LevelDB_ConfigMod::getInstance().getBloom_filename();
@@ -36,6 +38,7 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     options.max_file_size = max_File_sizes;
     options.max_open_files = max_open_files;
     options.size_ratio = size_ratio;
+    options.block_cache = leveldb::NewLRUCache(blockCacheSize);
     fprintf(stderr,"size ratio:%d \n",size_ratio);
     if(LevelDB_ConfigMod::getInstance().getStatisticsOpen()){
 	options.stats_ = leveldb::CreateDBStatistics();
