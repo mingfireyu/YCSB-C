@@ -55,6 +55,7 @@ private:
     bool _directIO_flag;
     bool _statistics_open;
     int _size_ratio;
+    size_t _block_cache_size;
 public:
     std::string getBloom_filename();
     int getMax_open_files();
@@ -67,6 +68,7 @@ public:
     bool getDirectIOFlag();
     bool getStatisticsOpen();
     int getSizeRatio();
+    size_t getBlockCacheSize();
 };
 
 #endif
