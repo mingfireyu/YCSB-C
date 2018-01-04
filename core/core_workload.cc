@@ -14,7 +14,8 @@
 #include "core_workload.h"
 #include "HotspotIntegerGenerator.h"
 #include <string>
-
+#include <iostream>
+using namespace std;
 using ycsbc::CoreWorkload;
 using std::string;
 
@@ -184,7 +185,7 @@ void CoreWorkload::Init(const utils::Properties &p) {
   } else {
     ordered_inserts_ = true;
   }
-  
+  cerr << "insert start "<<insert_start<<endl;
   key_generator_ = new CounterGenerator(insert_start);
   
   if (read_proportion > 0) {
