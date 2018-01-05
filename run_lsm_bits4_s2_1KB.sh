@@ -76,8 +76,8 @@ types=(lsm-hierarchical)
 bloom_bit_array=(4)
 level=6
 sizeRatio=2
-requestdistribution=zipfian
-zipfianconsts=(0.99 1.10 1.20)
+requestdistribution=uniform
+zipfianconsts=(0.99) 
 for lsmtype in ${types[@]}
 do
 #    __checkOutBranch NoSeekCompaction
@@ -95,18 +95,18 @@ do
 	    __modifyConfig bloomFilename /home/ming/workspace/blooml"$level"_"$bloombits".txt
 	else
 	    echo "lsm-hierarchical"
-	    __modifyConfig bloomFilename /home/ming/workspace/blooml"$level"_"$bloombits"_h1.txt
+	    __modifyConfig bloomFilename /home/ming/workspace/blooml"$level"_"$bloombits"_h1_"$sizeRatio".txt
 	fi
 	#__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/workspace/YCSB-C/lsm_"$DISK"_read/skipratio2_zip1.2_sizeRatio"$sizeRatio" "$level"  "$lsmtype" "$bloombits"
 	if [ "$requestdistribution" = "zipfian" ]; then
 	    echo "zipfian"
 	    for zipfianconst in ${zipfianconsts[@]}
 	    do
-		__runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/experiment/hlsm_"$DISK"_read/skipratio2_"$requestdistribution""$zipfianconst"_sizeRatio"$sizeRatio" "$level"  "$lsmtype" "$bloombits"
+		__runLSM l04bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/experiment/hlsm_"$DISK"_read/skipratio2_"$requestdistribution""$zipfianconst"_sizeRatio"$sizeRatio" "$level"  "$lsmtype" "$bloombits"
 	    done
 	else
 	    echo "$requestdistribution"
-	    __runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/experiment/hlsm_"$DISK"_read/skipratio2_"$requestdistribution"_sizeRatio"$sizeRatio" "$level"  "$lsmtype" "$bloombits"
+	    __runLSM l04bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" /home/ming/experiment/hlsm_"$DISK"_read/skipratio2_"$requestdistribution"_sizeRatio"$sizeRatio" "$level"  "$lsmtype" "$bloombits"
 	fi
 
     done
