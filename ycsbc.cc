@@ -76,7 +76,7 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
       end_flag_ = true;
       ycsbc::CoreWorkload nwl;
       nwl.Init(*props_ptr);
-      cout<<"Adjust bloom filter accroding to access frequencies"<<endl;
+      //      cout<<"Adjust bloom filter accroding to access frequencies"<<endl;
       //      db->doSomeThing();
       return DelegateClient(db,&nwl,num_ops,is_loading);
     }
@@ -93,7 +93,7 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
 int main(const int argc, const char *argv[]) {
   utils::Properties props;
   string file_name = ParseCommandLine(argc, argv, props);
-
+  struct timeval start_main_time,end_main_time,res_main_time;
   ycsbc::DB *db = ycsbc::DBFactory::CreateDB(props);
   if (!db) {
     cout << "Unknown database name " << props["dbname"] << endl;
@@ -113,6 +113,7 @@ int main(const int argc, const char *argv[]) {
   size_t total_ops = 0;
   sscanf(props[ycsbc::CoreWorkload::RECORD_COUNT_PROPERTY].c_str(),"%zu",&total_ops);
   size_t sum = 0;
+  gettimeofday(&start_main_time,NULL);
   if(!skipLoad){
 	for (size_t i = 0; i < num_threads; ++i) {
 	    actual_ops.emplace_back(async(launch::async,
@@ -152,6 +153,10 @@ int main(const int argc, const char *argv[]) {
   cerr << props["dbname"] << '\t' << file_name << '\t' << num_threads << '\t'<<endl;;
   cerr << "run time: " << timer.elapsed() <<"us"<<endl;
   delete db;
+  gettimeofday(&end_main_time,NULL);
+  timersub(&end_main_time,&start_main_time,&res_main_time);
+  cout<<"Total time of main: "<<res_main_time.tv_sec * 1000000 + res_main_time.tv_usec<<"us"<<endl;
+
 }
 
 string ParseCommandLine(int argc, const char *argv[], utils::Properties &props) {
