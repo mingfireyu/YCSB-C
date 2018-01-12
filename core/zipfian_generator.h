@@ -22,7 +22,7 @@ class ZipfianGenerator : public Generator<uint64_t> {
   static const uint64_t kMaxNumItems = (UINT64_MAX >> 24);
   
   ZipfianGenerator(uint64_t min, uint64_t max,
-                   double zipfian_const = kZipfianConst) :
+                   double zipfian_const ) :
       num_items_(max - min + 1), base_(min), theta_(zipfian_const),
       zeta_n_(0), n_for_zeta_(0) {
     fprintf(stderr,"zipfian const %.3lf \n",zipfian_const);
@@ -34,7 +34,8 @@ class ZipfianGenerator : public Generator<uint64_t> {
     
     Next();
   }
-  
+  ZipfianGenerator(uint64_t num_items,double zipfian_const):
+      ZipfianGenerator(0, num_items - 1, zipfian_const) { }
   ZipfianGenerator(uint64_t num_items) :
       ZipfianGenerator(0, num_items - 1, kZipfianConst) { }
   
