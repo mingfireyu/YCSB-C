@@ -66,10 +66,10 @@ bloom_bit_array=(4)
 level=6
 maxOpenfiles=60000
 directIOFlag=true
-blockCacheSizes=(32) #MB
+blockCacheSizes=(0 32) #MB
 sizeRatio=10
-requestdistribution=zipfian
-zipfianconsts=(1.10 1.20)
+requestdistribution=uniform
+zipfianconsts=(0.99)
 #dbfilename="$dbfilename_o""$level"
 for blockCacheSize in ${blockCacheSizes[@]}
 do
@@ -92,12 +92,12 @@ do
 		for zipfianconst in ${zipfianconsts[@]}
 		do
 		    dirname=/home/ming/experiment/lsm_"$DISK"_read_zipfian"$zipfianconst"/experiment"$experiment_time"_"$value_size"/bloombits"$bloombits"level"$level"/open_files_"$maxOpenfiles"_notfound_100WRead_directIO"$directIOFlag"_blockCacheSize"$blockCacheSize"MB_sizeRatio"$sizeRatio"
-		    __runLSM l04bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" 
+		    __runLSM l00_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" 
 		done
 	    else
 		echo "$requestdistribution"
 		dirname=/home/ming/experiment/lsm_"$DISK"_read_"$requestdistribution"/experiment"$experiment_time"_"$value_size"/bloombits"$bloombits"level"$level"/open_files_"$maxOpenfiles"_notfound_100WRead_directIO"$directIOFlag"_blockCacheSize"$blockCacheSize"MB_sizeRatio"$sizeRatio"
-		__runLSM l04bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" 
+		__runLSM l00_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" 
 	    fi
 
 	done
