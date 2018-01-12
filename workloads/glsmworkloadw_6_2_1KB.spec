@@ -1,4 +1,3 @@
-File Edit Options Buffers Tools Sh-Script Help                                                                      
 # Yahoo! Cloud System Benchmark                                                                                     
 # Workload A: Update heavy workload                                                                                 
 #   Application example: Session store recording recent actions                                                     
@@ -25,6 +24,8 @@ withtimestamp=false
 timestamptracefilename=trace2.txt
 withoperation=false
 
+
+adjustfilter=false
 
 withlatency=true
 latencyfilename=testlf
