@@ -20,26 +20,12 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     int max_open_files = LevelDB_ConfigMod::getInstance().getMax_open_files();
     int max_File_sizes = LevelDB_ConfigMod::getInstance().getMax_file_size();
     int bloom_type = LevelDB_ConfigMod::getInstance().getBloomType();
-    bool seek_compaction_flag = LevelDB_ConfigMod::getInstance().getSeekCompactionFlag();
     size_t block_cache_size = LevelDB_ConfigMod::getInstance().getBlockCacheSize();
-    int size_ratio = LevelDB_ConfigMod::getInstance().getSizeRatio();
-    cout<<"seek compaction flag:";
-    if(seek_compaction_flag){
-      cout<<"true"<<endl;
-    }else{
-      cout<<"false"<<endl;
-    }
-    
     bool compression_Open = LevelDB_ConfigMod::getInstance().getCompression_flag();
-    bool directIO_flag = LevelDB_ConfigMod::getInstance().getDirectIOFlag();
-    if(directIO_flag){
-	   options.opEp_.no_cache_io_ = true;
-	   fprintf(stderr,"directIO\n");
-	   //    leveldb::setDirectIOFlag(directIO_flag);
-    }
     if(bloom_type == 1){
     }else if(bloom_type == 0){
 	options.filter_policy = leveldb::NewBloomFilterPolicy(bloom_bits);
+	fprintf(stderr,"use origin bloom_bits:%d  \n",bloom_bits);
     }else if(bloom_type == 2){
     }else{
 	fprintf(stderr,"Wrong filter type!\n");
@@ -49,14 +35,8 @@ LevelDB::LevelDB(const char* dbfilename,const char* configPath)
     options.compression = compression_Open?leveldb::kSnappyCompression:leveldb::kNoCompression;  //compression is disabled.
     options.max_file_size = max_File_sizes;
     options.max_open_files = max_open_files;
-    options.opEp_.seek_compaction_ = seek_compaction_flag;
     options.block_cache = leveldb::NewLRUCache(block_cache_size);
-    options.opEp_.size_ratio = size_ratio;
-    fprintf(stderr," block_cache_size %lu  size_ratio: %d \n",block_cache_size,size_ratio);
-    if(LevelDB_ConfigMod::getInstance().getStatisticsOpen()){
-      options.opEp_.stats_ = leveldb::CreateDBStatistics();
-    }
-   
+    fprintf(stderr," block_cache_size %lu   \n",block_cache_size);
     leveldb::Status status = leveldb::DB::Open(options,dbfilename, &db_);
     if(!status.ok()){
 	fprintf(stderr,"can't open leveldb\n");
