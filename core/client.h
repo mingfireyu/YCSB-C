@@ -90,13 +90,16 @@ class Client {
 	    printf("output latency to filename :%s \n",wl.LATENCYFILENAME_PROPERTY.c_str());
 	    latency_fp_ = wl.latency_fp_;
 	    std::string nlf_filename_str = "nlf" + std::to_string(wl.initCount) + ".txt"; 	    
+	    std::string wlf_filename_str = "wlf" + std::to_string(wl.initCount) + ".txt";
 	    nlatency_fp_ = fopen(nlf_filename_str.c_str(),"w");
+	    wlatency_fp_ = fopen(wlf_filename_str.c_str(),"w");
 	    if(nlatency_fp_ == NULL){
 	      perror("client init:");
 	    }
 	}else{
 	    latency_fp_ = NULL;
 	    nlatency_fp_ = NULL;
+	    wlatency_fp_ = NULL;
 	}
 	line_ = NULL;
 	first_do_transaction = false;
@@ -109,6 +112,7 @@ class Client {
       if(latency_fp_){
 	fflush(latency_fp_);
 	fflush(nlatency_fp_);
+	fflush(wlatency_fp_);
       }
  }
   
@@ -131,6 +135,7 @@ class Client {
   double current_timestamp_;
   FILE *latency_fp_;
   FILE *nlatency_fp_;
+  FILE *wlatency_fp_;
 };
 
 inline bool Client::DoInsert(bool insert_real) {
@@ -185,12 +190,20 @@ inline bool Client::DoTransaction(size_t ops[],double durations[],bool do_real) 
       break;
     case UPDATE:
       status = TransactionUpdate();
-      durations[INSERT] += (transaction_timer.elapsed());
+      latency = transaction_timer.elapsed();
+      durations[INSERT] += latency;
+      if(wlatency_fp_!=NULL){
+	fprintf(wlatency_fp_,"%llu,",latency);
+      }
       ops[INSERT]++;
       break;
     case INSERT:
       status = TransactionInsert();
-      durations[INSERT] += (transaction_timer.elapsed());
+      latency = transaction_timer.elapsed();
+      durations[INSERT] += latency;
+      if(wlatency_fp_!=NULL){
+	fprintf(wlatency_fp_,"%llu,",latency);
+      }
       ops[INSERT]++;
       break;
     case SCAN:

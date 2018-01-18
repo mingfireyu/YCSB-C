@@ -1,0 +1,24 @@
+_bloom_bits_4
+seek compaction flag:false
+--------------------------- Before Do Transaction -----------------------------------------
+read latency:-nan	read counts:0
+write latency:-nan	write counts:0
+                               Compactions
+Level  Files Size(MB) Time(sec) Read(MB) Write(MB)
+--------------------------------------------------
+  0        3        9         0        0         2
+  1        7       10         0        0         0
+  2       67       99         0        0         0
+  3      792      999         0        0         0
+  4     5033     9999         0        0         0
+  5      805     1604         0        0         0
+filter mem space overhead:6053 filter num:1 
+average create filters time  = 485.000 create filter count:1 
+average sync SSTable time = 40554.000 sync SSTable count: 1
+average add filter time  = 8023.000 add filters count:1 
+leveldb.block.new.time min:1.000 ave:1.000 max:1.000 count:3
+leveldb.block.file.read.time min:207.000 ave:5516.667 max:8321.000 count:3
+leveldb.open.table.time min:-1.000 ave:20909.000 max:20909.000 count:1
+
+----------------------------Transaction Output------------------
+output latency to filename :latencyfilename 
