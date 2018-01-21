@@ -57,7 +57,8 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
 	gettimeofday(&end_phase_time,NULL);
 	timersub(&end_phase_time,&start_phase_time,&res_time);
 	start_phase_time = end_phase_time;
-	fprintf(fp_phase,"%lu\n",res_time.tv_sec * 1000000 + res_time.tv_usec);
+	long res_value = res_time.tv_sec * 1000000 + res_time.tv_usec;
+	fprintf(fp_phase,"%ld \n",res_value);
       }else if(!is_loading){
 	cerr<<"operation count:"<<i<<"\r";
       }
@@ -87,10 +88,11 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
     cout<<"Total time of insert: "<<res_time.tv_sec * 1000000 + res_time.tv_usec<<"us"<<endl;
     cout<<"Per insert time: "<<(res_time.tv_sec * 1000000 + res_time.tv_usec)*1.0/oks<<"us"<<endl;
   }
-  //  end_flag_ = true;
+  end_flag_ = true;
   db->Close();
   if(fp_phase != NULL){
     fclose(fp_phase);
+    fp_phase = NULL;
   }
   return oks;
 }
