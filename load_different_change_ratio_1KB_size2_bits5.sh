@@ -75,11 +75,11 @@ FilterCapacityRatios=(5.0)
 blockCacheSizes=(0) #MB
 changeRatios=(0.00001)
 initFilterNum=2
-directIOFlag=true
+directIOFlag=false
 requestdistribution=zipfian
 zipfianconst=1.20
-maxOpenfiles=684
-bitsArrayFilename=/home/ming/workspace/bitsArray423344.txt
+maxOpenfiles=550
+bitsArrayFilename=/home/ming/workspace/bitsArray233344.txt
 __modifyConfig maxOpenfiles "$maxOpenfiles"
 __modifyConfig bitsArrayFilename "$bitsArrayFilename"
 echo "$dbfilename"
@@ -106,10 +106,10 @@ do
 	    section=basic
 	    if [ "$requestdistribution" = "zipfian" ]; then
 		echo "zipfian"
-		dirname=/home/ming/experiment/expectation/lsm_"$DISK"_read_"$requestdistribution""$zipfianconst"_multi_filter_sizeRatio"$sizeRatio"/experiment"$experiment_time"/FilterCapacityRatio_"$FilterCapacityRatio"_lru0_30WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
+		dirname=/home/ming/experiment/expectation/mlsm_"$DISK"_read_"$requestdistribution""$zipfianconst"_multi_filter_sizeRatio"$sizeRatio"/experiment"$experiment_time"/NoModFilterCapacityRatio_"$FilterCapacityRatio"_lru0_30WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
 	    else
 		echo "$requestdistribution"
-		dirname=/home/ming/experiment/expectation/lsm_"$DISK"_read_"$requestdistribution"_multi_filter_sizeRatio"$sizeRatio"/experiment"$experiment_time"/FilterCapacityRatio_"$FilterCapacityRatio"_lru0_30WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
+		dirname=/home/ming/experiment/expectation/mlsm_"$DISK"_read_"$requestdistribution"_multi_filter_sizeRatio"$sizeRatio"/experiment"$experiment_time"/NoModFilterCapacityRatio_"$FilterCapacityRatio"_lru0_30WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
 	    fi
 	    __loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
 	    __runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" "$changeRatio"

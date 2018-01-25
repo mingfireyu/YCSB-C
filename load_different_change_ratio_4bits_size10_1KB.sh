@@ -1,7 +1,7 @@
 #!/bin/bash
 experiment_time=4
-DISK=SSD"$experiment_time"
 value_size=1KB
+DISK=SSD"$experiment_time"
 dbfilename_o=/home/ming/"$DISK"_"$value_size"/mlsm
 configpath=./configDir/leveldb_config.ini
 section=basic
@@ -20,8 +20,7 @@ function __loadLSM(){
     levelIn=$3
     ltype=$4
     bb=$5
-    workloadw_name=./workloads/glsmworkloadw_"$levelIn"_"$sizeRatio"_"$value_size".spec
-    echo "$workloadw_name"
+    workloadw_name=./workloads/glsmworkloadw_"$levelIn"_b"$bb"_"$sizeRatio"_"$value_size".spec
     if [ ! -d "$dirname" ]; then
 	mkdir  -p "$dirname"
     fi
@@ -40,9 +39,8 @@ function __runLSM(){
     ltype=$4
     bb=$5
     cR=$6
-    workloadr_name=./workloads/glsmworkloadr_"$levelIn"_"$sizeRatio"_"$value_size".spec
-    life_times=(200)
-    echo "$workloadr_name"
+    workloadr_name=./workloads/glsmworkloadr_"$levelIn"_b"$bb"_"$sizeRatio"_"$value_size".spec
+    life_times=(10000)
     __modifyConfig directIOFlag "$directIOFlag"
     section=LRU
     if [ ! -d "$dirname" ]; then
@@ -69,20 +67,18 @@ function __runLSM(){
 lsmtype=(lsm)
 bloombits=4
 level=6
-sizeRatio=2
+sizeRatio=10
 dbfilename="$dbfilename_o"l"$level"s"$sizeRatio"b"$bloombits"
 FilterCapacityRatios=(4.0)
 blockCacheSizes=(0) #MB
-changeRatios=(0.0001) 
+changeRatios=(0.0001)
 initFilterNum=2
 directIOFlag=true
-requestdistribution=uniform
-zipfianconsts=(0.99)
-maxOpenfiles=684
-bitsArrayFilename=/home/ming/workspace/bitsArray233344.txt
-__modifyConfig maxOpenfiles "$maxOpenfiles"
-__modifyConfig bitsArrayFilename "$bitsArrayFilename"
+requestdistribution=zipfian
+zipfianconst=1.10
 echo "$dbfilename"
+bitsArrayFilename=/home/ming/workspace/bitsArray355555.txt
+__modifyConfig bitsArrayFilename "$bitsArrayFilename"
 for blockCacheSize in ${blockCacheSizes[@]}
 do
     let bcs=blockCacheSize*1024*1024
@@ -104,18 +100,15 @@ do
 	    section=LRU
 	    __modifyConfig changeRatio "$changeRatio"
 	    section=basic
-	    for zipfianconst in ${zipfianconsts[@]}
-	    do
-		if [ "$requestdistribution" = "zipfian" ]; then
-		    echo "zipfian"
-		    dirname=/home/ming/experiment/expectation/mlsm_"$DISK"_read_"$requestdistribution""$zipfianconst"_multi_filter_sizeRatio"$sizeRatio"/experiment"$experiment_time"/ExpFreFilterCapacityRatio_"$FilterCapacityRatio"_lru0_30WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
-		else
-		    echo "$requestdistribution"
-		    dirname=/home/ming/experiment/expectation/mlsm_"$DISK"_read_"$requestdistribution"_multi_filter_sizeRatio"$sizeRatio"/experiment"$experiment_time"/ExpFreFilterCapacityRatio_"$FilterCapacityRatio"_lru0_30WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
-		fi
-		# __loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
-		__runLSM l01_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" "$changeRatio"
-	    done
+	    if [ "$requestdistribution" = "zipfian" ]; then
+		echo "zipfian"
+		dirname=/home/ming/experiment/expectation/lsm_"$DISK"_read_"$requestdistribution""$zipfianconst"_multi_filter_sizeRatio"$sizeRatio"/experiment"$experiment_time"_"$value_size"/FilterCapacityRatio_"$FilterCapacityRatio"_lru0_1000WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
+	    else
+		echo "$requestdistribution"
+		dirname=/home/ming/experiment/expectation/lsm_"$DISK"_read_"$requestdistribution"_multi_filter_sizeRatio"$sizeRatio"/experiment"$experiment_time"_"$value_size"/FilterCapacityRatio_"$FilterCapacityRatio"_lru0_1000WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
+	    fi
+	    __loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
+	    __runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" "$changeRatio"
 	done
     done
 done

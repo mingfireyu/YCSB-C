@@ -20,7 +20,7 @@ function __loadLSM(){
     levelIn=$3
     ltype=$4
     bb=$5
-    workloadw_name=./workloads/glsmworkloadw_"$levelIn"_"$sizeRatio"_"$value_size".spec
+    workloadw_name=./workloads/ilsmworkloadw_"$levelIn"_"$sizeRatio"_"$value_size".spec
     echo "$workloadw_name"
     if [ ! -d "$dirname" ]; then
 	mkdir  -p "$dirname"
@@ -40,7 +40,7 @@ function __runLSM(){
     ltype=$4
     bb=$5
     cR=$6
-    workloadr_name=./workloads/glsmworkloadr_"$levelIn"_"$sizeRatio"_"$value_size".spec
+    workloadr_name=./workloads/ilsmworkloadr_"$levelIn"_"$sizeRatio"_"$value_size".spec
     life_times=(200)
     echo "$workloadr_name"
     __modifyConfig directIOFlag "$directIOFlag"
@@ -59,7 +59,7 @@ function __runLSM(){
 	mv testlf1.txt "$dirname"/latency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_changeRatio"$cR"_lifetime"$life_time".txt
 	mv nlf1.txt "$dirname"/nlatency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_changeRatio"$cR"_lifetime"$life_time".txt
 	mv level?_access_frequencies.txt "$dirname"/
-        sleep 100s
+        #sleep 100s
     done
     cp configDir/leveldb_config.ini "$dirname"/
     section=basic
@@ -75,10 +75,10 @@ FilterCapacityRatios=(4.0)
 blockCacheSizes=(0) #MB
 changeRatios=(0.0001) 
 initFilterNum=2
-directIOFlag=true
+directIOFlag=false
 requestdistribution=uniform
 zipfianconsts=(0.99)
-maxOpenfiles=684
+maxOpenfiles=664
 bitsArrayFilename=/home/ming/workspace/bitsArray233344.txt
 __modifyConfig maxOpenfiles "$maxOpenfiles"
 __modifyConfig bitsArrayFilename "$bitsArrayFilename"
@@ -114,7 +114,7 @@ do
 		    dirname=/home/ming/experiment/expectation/mlsm_"$DISK"_read_"$requestdistribution"_multi_filter_sizeRatio"$sizeRatio"/experiment"$experiment_time"/ExpFreFilterCapacityRatio_"$FilterCapacityRatio"_lru0_30WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
 		fi
 		# __loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
-		__runLSM l01_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" "$changeRatio"
+		__runLSM l01_insert_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" "$changeRatio"
 	    done
 	done
     done

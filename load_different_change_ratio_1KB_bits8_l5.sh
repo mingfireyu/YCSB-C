@@ -1,9 +1,10 @@
 #!/bin/bash
-experiment_time=4
-DISK=SSD"$experiment_time"
+experiment_time=8
 value_size=1KB
+DISK=HDD"$experiment_time"
 dbfilename_o=/home/ming/"$DISK"_"$value_size"/mlsm
 configpath=./configDir/leveldb_config.ini
+arrayname=755555
 section=basic
 
 function __modifyConfig(){
@@ -21,12 +22,12 @@ function __loadLSM(){
     ltype=$4
     bb=$5
     workloadw_name=./workloads/glsmworkloadw_"$levelIn"_"$sizeRatio"_"$value_size".spec
-    echo "$workloadw_name"
     if [ ! -d "$dirname" ]; then
 	mkdir  -p "$dirname"
     fi
     __modifyConfig directIOFlag false
     ./ycsbc -db leveldb -threads 1 -P $workloadw_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad false > "$loadname"
+    mv phase_time.txt "$dirname"/"$arrayname"_phase_time"$loadname"
     sync;echo 1 > /proc/sys/vm/drop_caches
     sleep 100s
     mv "$loadname" "$dirname"
@@ -41,8 +42,7 @@ function __runLSM(){
     bb=$5
     cR=$6
     workloadr_name=./workloads/glsmworkloadr_"$levelIn"_"$sizeRatio"_"$value_size".spec
-    life_times=(200)
-    echo "$workloadr_name"
+    life_times=(10000)
     __modifyConfig directIOFlag "$directIOFlag"
     section=LRU
     if [ ! -d "$dirname" ]; then
@@ -67,22 +67,20 @@ function __runLSM(){
 
 
 lsmtype=(lsm)
-bloombits=4
-level=6
-sizeRatio=2
-dbfilename="$dbfilename_o"l"$level"s"$sizeRatio"b"$bloombits"
-FilterCapacityRatios=(4.0)
+bloombits=8
+level=5
+sizeRatio=10
+dbfilename="$dbfilename_o"l"$level"s"$sizeRatio"b"$bloombits"_"$arrayname"
+FilterCapacityRatios=(8.0)
 blockCacheSizes=(0) #MB
-changeRatios=(0.0001) 
-initFilterNum=2
-directIOFlag=true
-requestdistribution=uniform
-zipfianconsts=(0.99)
-maxOpenfiles=684
-bitsArrayFilename=/home/ming/workspace/bitsArray233344.txt
-__modifyConfig maxOpenfiles "$maxOpenfiles"
-__modifyConfig bitsArrayFilename "$bitsArrayFilename"
+changeRatios=(0.0001)
+initFilterNum=1
+directIOFlag=false
+requestdistribution=zipfian
+zipfianconst=1.10
+bitsArrayFilename=/home/ming/workspace/bitsArray"$arrayname".txt
 echo "$dbfilename"
+__modifyConfig bitsArrayFilename "$bitsArrayFilename"
 for blockCacheSize in ${blockCacheSizes[@]}
 do
     let bcs=blockCacheSize*1024*1024
@@ -104,18 +102,15 @@ do
 	    section=LRU
 	    __modifyConfig changeRatio "$changeRatio"
 	    section=basic
-	    for zipfianconst in ${zipfianconsts[@]}
-	    do
-		if [ "$requestdistribution" = "zipfian" ]; then
-		    echo "zipfian"
-		    dirname=/home/ming/experiment/expectation/mlsm_"$DISK"_read_"$requestdistribution""$zipfianconst"_multi_filter_sizeRatio"$sizeRatio"/experiment"$experiment_time"/ExpFreFilterCapacityRatio_"$FilterCapacityRatio"_lru0_30WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
-		else
-		    echo "$requestdistribution"
-		    dirname=/home/ming/experiment/expectation/mlsm_"$DISK"_read_"$requestdistribution"_multi_filter_sizeRatio"$sizeRatio"/experiment"$experiment_time"/ExpFreFilterCapacityRatio_"$FilterCapacityRatio"_lru0_30WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
-		fi
-		# __loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
-		__runLSM l01_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" "$changeRatio"
-	    done
+	    if [ "$requestdistribution" = "zipfian" ]; then
+		echo "zipfian"
+		dirname=/home/ming/experiment/expectation/lsm_"$DISK"_read_"$requestdistribution""$zipfianconst"_multi_filter_sizeRatio"$sizeRatio"/experiment"$experiment_time"_"$value_size"/FilterCapacityRatio_"$FilterCapacityRatio"_lru0_100WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
+	    else
+		echo "$requestdistribution"
+		dirname=/home/ming/experiment/expectation/lsm_"$DISK"_read_"$requestdistribution"_multi_filter_sizeRatio"$sizeRatio"/experiment"$experiment_time"_"$value_size"/FilterCapacityRatio_"$FilterCapacityRatio"_lru0_100WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
+	    fi
+	    __loadLSM 20GBtrim_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
+	   # __runLSM trim_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" "$changeRatio"
 	done
     done
 done

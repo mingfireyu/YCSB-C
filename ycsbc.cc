@@ -27,8 +27,10 @@ bool end_flag_ = false;
 utils::Properties *props_ptr = NULL;
 size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_ops,
     bool is_loading) {
+  FILE *fp_phase = NULL;
   if(!end_flag_){
     db->Init();
+    fp_phase = fopen("phase_time.txt","w");
   }
   size_t ops[3] = {0,0,0};
   double durations[] = {0,0,0};
@@ -39,7 +41,9 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
   cerr<<"skipratio_inload"<<skipratio_inload<<endl;
   cerr<<"num_ops"<<num_ops<<endl;
   struct timeval start_insert_time,end_insert_time,res_time;
+  struct timeval start_phase_time,end_phase_time;
   gettimeofday(&start_insert_time,NULL);
+  gettimeofday(&start_phase_time,NULL);
   for (size_t i = 0; i < num_ops; ++i) {
     if (is_loading) {
       if(skipratio_inload&&i%skipratio_inload!=0){
@@ -51,8 +55,12 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
       oks += client.DoTransaction(ops,durations);
     }
     if(i%10000 == 0){
-      if(is_loading && i%100000 == 0){
+      if(is_loading && i%200000 == 0){
 	cerr<<"operation count:"<<i<<"\r";
+	gettimeofday(&end_phase_time,NULL);
+	timersub(&end_phase_time,&start_phase_time,&res_time);
+	start_phase_time = end_phase_time;
+	fprintf(fp_phase,"%lu\n",res_time.tv_sec * 1000000 + res_time.tv_usec);
       }else if(!is_loading){
 	cerr<<"operation count:"<<i<<"\r";
       }
@@ -86,6 +94,9 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
   }
   end_flag_ = true;
   db->Close();
+  if(fp_phase != NULL){
+    fclose(fp_phase);
+  }
   return oks;
 }
 

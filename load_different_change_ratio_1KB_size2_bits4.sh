@@ -28,7 +28,7 @@ function __loadLSM(){
     __modifyConfig directIOFlag false
     ./ycsbc -db leveldb -threads 1 -P $workloadw_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad false > "$loadname"
     sync;echo 1 > /proc/sys/vm/drop_caches
-    sleep 100s
+   # sleep 100s
     mv "$loadname" "$dirname"
 }
 
@@ -73,13 +73,13 @@ sizeRatio=2
 dbfilename="$dbfilename_o"l"$level"s"$sizeRatio"b"$bloombits"
 FilterCapacityRatios=(4.0)
 blockCacheSizes=(0) #MB
-changeRatios=(0.00001)
+changeRatios=(0.0001)
 initFilterNum=2
-directIOFlag=true
-requestdistribution=zipfian
-zipfianconst=1.20
-maxOpenfiles=684
-bitsArrayFilename=/home/ming/workspace/bitsArray323344.txt
+directIOFlag=false
+requestdistribution=uniform
+zipfianconst=0.99
+maxOpenfiles=664
+bitsArrayFilename=/home/ming/workspace/bitsArray233344.txt
 __modifyConfig maxOpenfiles "$maxOpenfiles"
 __modifyConfig bitsArrayFilename "$bitsArrayFilename"
 echo "$dbfilename"
@@ -106,13 +106,13 @@ do
 	    section=basic
 	    if [ "$requestdistribution" = "zipfian" ]; then
 		echo "zipfian"
-		dirname=/home/ming/experiment/expectation/lsm_"$DISK"_read_"$requestdistribution""$zipfianconst"_multi_filter_sizeRatio"$sizeRatio"/experiment"$experiment_time"/FilterCapacityRatio_"$FilterCapacityRatio"_lru0_30WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
+		dirname=/home/ming/experiment/expectation/lsm_"$DISK"_read_"$requestdistribution""$zipfianconst"_multi_filter_sizeRatio"$sizeRatio"/experiment"$experiment_time"/ExpFilterCapacityRatio_"$FilterCapacityRatio"_lru0_30WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
 	    else
 		echo "$requestdistribution"
-		dirname=/home/ming/experiment/expectation/lsm_"$DISK"_read_"$requestdistribution"_multi_filter_sizeRatio"$sizeRatio"/experiment"$experiment_time"/FilterCapacityRatio_"$FilterCapacityRatio"_lru0_30WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
+		dirname=/home/ming/experiment/expectation/lsm_"$DISK"_read_"$requestdistribution"_multi_filter_sizeRatio"$sizeRatio"/experiment"$experiment_time"/ExpFilterCapacityRatio_"$FilterCapacityRatio"_lru0_30WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
 	    fi
 	    __loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
-	   # __runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" "$changeRatio"
+	    __runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" "$changeRatio"
 	done
     done
 done

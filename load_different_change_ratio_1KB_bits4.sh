@@ -26,8 +26,9 @@ function __loadLSM(){
     fi
     __modifyConfig directIOFlag false
     ./ycsbc -db leveldb -threads 1 -P $workloadw_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad false > "$loadname"
+    mv phase_time.txt "$dirname"/phase_time"$loadname"
     sync;echo 1 > /proc/sys/vm/drop_caches
-    sleep 100s
+#    sleep 100s
     mv "$loadname" "$dirname"
 }
 
@@ -73,7 +74,7 @@ FilterCapacityRatios=(4.0)
 blockCacheSizes=(0) #MB
 changeRatios=(0.0001)
 initFilterNum=2
-directIOFlag=true
+directIOFlag=false
 requestdistribution=zipfian
 zipfianconst=1.10
 bitsArrayFilename=/home/ming/workspace/bitsArray355555.txt
@@ -107,8 +108,8 @@ do
 		echo "$requestdistribution"
 		dirname=/home/ming/experiment/expectation/lsm_"$DISK"_read_"$requestdistribution"_multi_filter_sizeRatio"$sizeRatio"/experiment"$experiment_time"_"$value_size"/FilterCapacityRatio_"$FilterCapacityRatio"_lru0_100WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
 	    fi
-	    __loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
-	    __runLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" "$changeRatio"
+	    __loadLSM trim_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
+	    __runLSM trim_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" "$changeRatio"
 	done
     done
 done
