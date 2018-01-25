@@ -1,10 +1,11 @@
 #!/bin/bash
-experiment_time=4
+experiment_time=6
 value_size=1KB
 DISK=SSD"$experiment_time"
 dbfilename_o=/home/ming/"$DISK"_"$value_size"/lsm
 configpath=./configDir/leveldb_config.ini
 section=basic
+
 function __modifyConfig(){
     key=$1
     value=$2
@@ -42,7 +43,7 @@ function __runLSM(){
     workloadr_name=./workloads/glsmworkloadr_"$levelIn"_"$sizeRatio"_"$value_size".spec
     echo workloadrname:"$workloadr_name"
     __modifyConfig directIOFlag "$directIOFlag"
-    for j in `seq 1 1`
+    for j in `seq 1 2`
     do
 	let count=300/"$j"
 	vmstat -n "$j" "$count"  > vmstat_"$count".txt &
@@ -52,24 +53,24 @@ function __runLSM(){
 	    mkdir  -p "$dirname"
 	fi
 	mv "$runname"_"$j".txt "$dirname"
-	mv testlf1.txt "$dirname"/latency_"$runname"_"$j"_noseek_fix"$j".txt
-	mv nlf1.txt "$dirname"/nlatency_"$runname"_"$bb"_"$j"_noseek_fix"$j".txt
+	mv testlf1.txt "$dirname"/latency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_"$j"_noseek_fix"$j".txt
+	mv nlf1.txt "$dirname"/nlatency_l"$levelIn"_lsmtype_"$ltype"_bloom_"$bb"_"$j"_noseek_fix"$j".txt
 	cp vmstat_"$count".txt "$dirname"/vmstat_count"$count"_"$j".txt
-        #sleep 100s
+        sleep 100s
     done
 
 }
 
 
 types=(lsm)
-bloom_bit_array=(4)
+bloom_bit_array=(6)
 level=6
 maxOpenfiles=60000
 directIOFlag=true
-blockCacheSizes=(8) #MB
+blockCacheSizes=(64) #MB
 sizeRatio=10
 requestdistribution=zipfian
-zipfianconsts=(0.99)
+zipfianconst=0.99
 #dbfilename="$dbfilename_o""$level"
 for blockCacheSize in ${blockCacheSizes[@]}
 do
@@ -86,21 +87,14 @@ do
 	    echo bloombits:"$bloombits"
 	    __modifyConfig bloomBits  "$bloombits"
 	    dbfilename="$dbfilename_o"l"$level"b"$bloombits"s"$sizeRatio"
-	    echo dbfilename: "$dbfilename"
 	    if [ "$requestdistribution" = "zipfian" ]; then
                 echo "zipfian"
-		for zipfianconst in ${zipfianconsts[@]}
-		do
-		    dirname=/home/ming/experiment/lsm_"$DISK"_read_zipfian"$zipfianconst"/experiment"$experiment_time"_"$value_size"/bloombits"$bloombits"level"$level"/open_files_"$maxOpenfiles"_notfound_100WRead_directIO"$directIOFlag"_blockCacheSize"$blockCacheSize"MB_sizeRatio"$sizeRatio"
-		    __runLSM l03_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" 
-		done
+		dirname=/home/ming/experiment/lsm_"$DISK"_read_zipfian"$zipfianconst"/experiment"$experiment_time"_"$value_size"/bloombits"$bloombits"level"$level"/open_files_"$maxOpenfiles"_allfound_100WRead_directIO"$directIOFlag"_blockCacheSize"$blockCacheSize"MB_sizeRatio"$sizeRatio"
 	    else
 		echo "$requestdistribution"
-		dirname=/home/ming/experiment/lsm_"$DISK"_read_"$requestdistribution"/experiment"$experiment_time"_"$value_size"/bloombits"$bloombits"level"$level"/open_files_"$maxOpenfiles"_notfound_100WRead_directIO"$directIOFlag"_blockCacheSize"$blockCacheSize"MB_sizeRatio"$sizeRatio"
-		zipfianconst=0.99
-		__runLSM l03_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" 
+		dirname=/home/ming/experiment/lsm_"$DISK"_read_"$requestdistribution"/experiment"$experiment_time"_"$value_size"/bloombits"$bloombits"level"$level"/open_files_"$maxOpenfiles"_allfound_100WRead_directIO"$directIOFlag"_blockCacheSize"$blockCacheSize"MB_sizeRatio"$sizeRatio"
 	    fi
-
+	    __loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" 
 	done
     done
 done
