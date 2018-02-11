@@ -54,8 +54,8 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
     } else {
       oks += client.DoTransaction(ops,durations);
     }
-    if(i%10000 == 0){
-      if(is_loading && i%200000 == 0){
+    if(i%10240 == 0){
+      if(is_loading && i%102400 == 0){
 	cerr<<"operation count:"<<i<<"\r";
 	gettimeofday(&end_phase_time,NULL);
 	timersub(&end_phase_time,&start_phase_time,&res_time);

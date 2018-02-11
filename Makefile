@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-std=c++11  -Wall -pthread -I./ -g
+CFLAGS=-std=c++11  -Wall -pthread -I./ 
 LDFLAGS= -lpthread -ltbb -lhiredis -lleveldb -lboost_system -lboost_thread
 SUBDIRS=core db redis
 SUBSRCS=$(wildcard core/*.cc) $(wildcard db/*.cc)

@@ -5,7 +5,7 @@ DISK=SSD"$experiment_time"
 dbfilename_o=/home/ming/"$DISK"_"$value_size"/mlsm
 configpath=./configDir/leveldb_config.ini
 section=basic
-
+arrayname=455555
 function __modifyConfig(){
     key=$1
     value=$2
@@ -15,7 +15,7 @@ function __modifyConfig(){
 function __loadLSM(){
     rm -rf "$dbfilename"
     loadname=$1
-    loadname="$loadname"_load.txt
+    loadname="$loadname"_load_"$arrayname".txt
     dirname=$2
     levelIn=$3
     ltype=$4
@@ -27,8 +27,9 @@ function __loadLSM(){
     __modifyConfig directIOFlag false
     ./ycsbc -db leveldb -threads 1 -P $workloadw_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad false > "$loadname"
     sync;echo 1 > /proc/sys/vm/drop_caches
-    sleep 100s
     mv "$loadname" "$dirname"
+    mv phase_time.txt "$dirname"/phase_time"$loadname"
+    sleep 100s
 }
 
 function __runLSM(){
@@ -68,15 +69,15 @@ lsmtype=(lsm)
 bloombits=5
 level=6
 sizeRatio=10
-dbfilename="$dbfilename_o"l"$level"s"$sizeRatio"b"$bloombits"
+dbfilename="$dbfilename_o"l"$level"s"$sizeRatio"b"$bloombits"a"$arrayname"
 FilterCapacityRatios=(5.0)
 blockCacheSizes=(0) #MB
 changeRatios=(0.0001)
-initFilterNum=2
+initFilterNum=1
 directIOFlag=false
 requestdistribution=zipfian
 zipfianconst=1.10
-bitsArrayFilename=/home/ming/workspace/bitsArray455555.txt
+bitsArrayFilename=/home/ming/workspace/bitsArray"$arrayname".txt
 echo "$dbfilename"
 __modifyConfig bitsArrayFilename "$bitsArrayFilename"
 for blockCacheSize in ${blockCacheSizes[@]}

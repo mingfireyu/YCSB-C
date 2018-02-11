@@ -5,7 +5,7 @@ DISK=SSD"$experiment_time"
 dbfilename_o=/home/ming/"$DISK"_"$value_size"/mlsm
 configpath=./configDir/leveldb_config.ini
 section=basic
-
+arrayname=4
 function __modifyConfig(){
     key=$1
     value=$2
@@ -15,7 +15,7 @@ function __modifyConfig(){
 function __loadLSM(){
     rm -rf "$dbfilename"
     loadname=$1
-    loadname="$loadname"_load.txt
+    loadname="$loadname"_load_"$arrayname".txt
     dirname=$2
     levelIn=$3
     ltype=$4
@@ -34,7 +34,7 @@ function __loadLSM(){
 
 function __runLSM(){
     runname=$1
-    runname="$runname"
+    runname="$runname"_"$arrayname"
     dirname=$2
     levelIn=$3
     ltype=$4
@@ -69,15 +69,15 @@ lsmtype=(lsm)
 bloombits=4
 level=6
 sizeRatio=10
-dbfilename="$dbfilename_o"l"$level"s"$sizeRatio"b"$bloombits"
+dbfilename="$dbfilename_o"l"$level"s"$sizeRatio"b"$bloombits"a"$arrayname"
 FilterCapacityRatios=(4.0)
 blockCacheSizes=(0) #MB
 changeRatios=(0.0001)
-initFilterNum=2
+initFilterNum=1
 directIOFlag=false
 requestdistribution=zipfian
 zipfianconst=1.10
-bitsArrayFilename=/home/ming/workspace/bitsArray355555.txt
+bitsArrayFilename=/home/ming/workspace/bitsArray"$arrayname".txt
 echo "$dbfilename"
 __modifyConfig bitsArrayFilename "$bitsArrayFilename"
 for blockCacheSize in ${blockCacheSizes[@]}
