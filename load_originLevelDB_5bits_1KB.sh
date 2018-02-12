@@ -28,9 +28,9 @@ function __loadLSM(){
     ./ycsbc -db leveldb -threads 1 -P $workloadw_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad false > "$loadname"
     mv phase_time.txt "$dirname"/phase_time_"$loadname"
     sync;echo 1 > /proc/sys/vm/drop_caches
-    sleep 100s
     mv "$loadname" "$dirname"
     cp configDir/leveldb_config.ini "$dirname"
+    sleep 100s
 }
 
 function __runLSM(){
@@ -66,7 +66,7 @@ types=(lsm)
 bloom_bit_array=(5)
 level=6
 maxOpenfiles=60000
-directIOFlag=true
+directIOFlag=false
 blockCacheSizes=(0) #MB
 sizeRatio=10
 requestdistribution=zipfian
@@ -96,7 +96,7 @@ do
 		dirname=/home/ming/experiment/lsm_"$DISK"_read_"$requestdistribution"/experiment"$experiment_time"_"$value_size"/bloombits"$bloombits"level"$level"/open_files_"$maxOpenfiles"_notfound_100WRead_directIO"$directIOFlag"_blockCacheSize"$blockCacheSize"MB_sizeRatio"$sizeRatio"
 	    fi
 	    __loadLSM trim_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" 
-	    __runLSM trim_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" 
+	   # __runLSM trim_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" 
 	done
     done
 done
