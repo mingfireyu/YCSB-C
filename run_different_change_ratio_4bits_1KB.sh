@@ -5,7 +5,7 @@ DISK=SSD"$experiment_time"
 dbfilename_o=/home/ming/"$DISK"_"$value_size"/mlsm
 configpath=./configDir/leveldb_config.ini
 section=basic
-
+arrayname=4
 function __modifyConfig(){
     key=$1
     value=$2
@@ -33,14 +33,14 @@ function __loadLSM(){
 
 function __runLSM(){
     runname=$1
-    runname="$runname"
+    runname="$runname"_"$arrayname"
     dirname=$2
     levelIn=$3
     ltype=$4
     bb=$5
     cR=$6
     workloadr_name=./workloads/glsmworkloadr_"$levelIn"_"$sizeRatio"_"$value_size".spec
-    life_times=(20000 10000)
+    life_times=(20000)
     __modifyConfig directIOFlag "$directIOFlag"
     section=LRU
     if [ ! -d "$dirname" ]; then
@@ -68,18 +68,18 @@ lsmtype=(lsm)
 bloombits=4
 level=6
 sizeRatio=10
-dbfilename="$dbfilename_o"l"$level"s"$sizeRatio"b"$bloombits"
+dbfilename="$dbfilename_o"l"$level"s"$sizeRatio"b"$bloombits"a"$arrayname"
 FilterCapacityRatios=(4.0)
-blockCacheSizes=(0) #MB
+blockCacheSizes=(64) #MB
 changeRatios=(0.0001)
-initFilterNum=2
+initFilterNum=1
 directIOFlag=true
 requestdistribution=zipfian
 zipfianconsts=(0.99)
 maxOpenfiles=57142
-LRUNum=7
+LRUNum=2
 echo "$dbfilename"
-bitsArrayFilename=/home/ming/workspace/bitsArray355555.txt
+bitsArrayFilename=/home/ming/workspace/bitsArray"$arrayname".txt
 __modifyConfig bitsArrayFilename "$bitsArrayFilename"
 __modifyConfig maxOpenfiles "$maxOpenfiles"
 for blockCacheSize in ${blockCacheSizes[@]}
@@ -114,7 +114,7 @@ do
 		dirname=/home/ming/experiment/expectation/lsm_"$DISK"_read_"$requestdistribution"_multi_filter_sizeRatio"$sizeRatio"/experiment"$experiment_time"_"$value_size"/FilterCapacityRatio_"$FilterCapacityRatio"_lru0_100WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
 	    fi
 	    #__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
-	    __runLSM rmcp_l03_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" "$changeRatio"
+	    __runLSM rmcp_l01_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" "$changeRatio"
             done
 	done
     done
