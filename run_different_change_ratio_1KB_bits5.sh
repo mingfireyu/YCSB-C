@@ -70,12 +70,12 @@ level=6
 sizeRatio=10
 dbfilename="$dbfilename_o"l"$level"s"$sizeRatio"b"$bloombits"a"$arrayname"
 FilterCapacityRatios=(5.0)
-blockCacheSizes=(0) #MB
+blockCacheSizes=(8) #MB
 changeRatios=(0.0001)
 initFilterNum=2
 directIOFlag=true
-requestdistribution=zipfian
-zipfianconsts=(0.99 1.10 1.20)
+requestdistribution=uniform
+zipfianconsts=(0.99)
 bitsArrayFilename=/home/ming/workspace/bitsArray"$arrayname".txt
 maxOpenfiles=57000
 echo "$dbfilename"

@@ -5,7 +5,7 @@ DISK=SSD"$experiment_time"
 dbfilename_o=/home/ming/"$DISK"_"$value_size"/mlsm
 configpath=./configDir/leveldb_config.ini
 section=basic
-
+arrayname=455555
 function __modifyConfig(){
     key=$1
     value=$2
@@ -33,7 +33,7 @@ function __loadLSM(){
 
 function __runLSM(){
     runname=$1
-    runname="$runname"
+    runname="$runname"_"$arrayname"
     dirname=$2
     levelIn=$3
     ltype=$4
@@ -68,7 +68,7 @@ lsmtype=(lsm)
 bloombits=5
 level=6
 sizeRatio=10
-dbfilename="$dbfilename_o"l"$level"s"$sizeRatio"b"$bloombits"
+dbfilename="$dbfilename_o"l"$level"s"$sizeRatio"b"$bloombits"a"$arrayname"
 FilterCapacityRatios=(5.0)
 blockCacheSizes=(0) #MB
 changeRatios=(0.0001)
@@ -78,7 +78,7 @@ requestdistribution=uniform
 zipfianconsts=(1.20)
 maxOpenfiles=58844
 echo "$dbfilename"
-bitsArrayFilename=/home/ming/workspace/bitsArray355555.txt
+bitsArrayFilename=/home/ming/workspace/bitsArray"$arrayname".txt
 LRUNum=7
 __modifyConfig bitsArrayFilename "$bitsArrayFilename"
 __modifyConfig maxOpenfiles "$maxOpenfiles"
@@ -114,7 +114,7 @@ do
 		dirname=/home/ming/experiment/expectation/lsm_"$DISK"_read_"$requestdistribution"_multi_filter_sizeRatio"$sizeRatio"/experiment"$experiment_time"_"$value_size"/FilterCapacityRatio_"$FilterCapacityRatio"_lru0_100WRead_initFilterNum"$initFilterNum"_directIO_"$directIOFlag"_blockCacheSize"$blockCacheSize"MB
 	    fi
 	    #__loadLSM bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits"
-	    __runLSM insert3_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" "$changeRatio"
+	    __runLSM insert1_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" "$changeRatio"
             done
 	done
     done
