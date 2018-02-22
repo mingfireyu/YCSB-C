@@ -65,10 +65,10 @@ types=(lsm)
 bloom_bit_array=(4)
 level=6
 maxOpenfiles=60000
-directIOFlag=true
-blockCacheSizes=(8) #MB
+directIOFlag=false
+blockCacheSizes=(0) #MB
 sizeRatio=10
-requestdistribution=zipfian
+requestdistribution=uniform
 zipfianconsts=(0.99)
 #dbfilename="$dbfilename_o""$level"
 for blockCacheSize in ${blockCacheSizes[@]}

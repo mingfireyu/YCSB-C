@@ -25,11 +25,11 @@ function __loadLSM(){
     __modifyConfig directIOFlag false
     ./ycsbc -db leveldb -threads 1 -P $workloadw_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad false > "$loadname"
     sync;echo 1 > /proc/sys/vm/drop_caches
-    sleep 100s
     if [ ! -d "$dirname" ]; then
 	mkdir  -p "$dirname"
     fi
     mv "$loadname" "$dirname"
+    sleep 100s
     cp configDir/leveldb_config.ini "$dirname"
 }
 
@@ -66,8 +66,8 @@ types=(lsm)
 bloombits=(5)
 level=6
 maxOpenfiles=60000
-directIOFlag=true
-blockCacheSizes=(8) #MB
+directIOFlag=false
+blockCacheSizes=(0) #MB
 sizeRatio=10
 requestdistribution=zipfian
 zipfianconsts=(0.99)
