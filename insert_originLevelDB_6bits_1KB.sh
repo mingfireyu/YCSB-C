@@ -46,7 +46,7 @@ function __runLSM(){
     do
 	let count=300/"$j"
 	vmstat -n "$j" "$count"  > vmstat_"$count".txt &
-        ./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true -requestdistribution "$requestdistribution" -zipfianconst "$zipfianconst" #> "$runname"_"$j".txt
+        ./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true -requestdistribution "$requestdistribution" -zipfianconst "$zipfianconst" > "$runname"_"$j".txt
 	sync;echo 1 > /proc/sys/vm/drop_caches
 	if [ ! -d "$dirname" ]; then
 	    mkdir  -p "$dirname"
