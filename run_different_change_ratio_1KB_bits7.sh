@@ -39,8 +39,8 @@ function __runLSM(){
     ltype=$4
     bb=$5
     cR=$6
-    workloadr_name=./workloads/glsmworkloadr_"$levelIn"_"$sizeRatio"_"$value_size".spec
-    life_times=(10000)
+    workloadr_name=./workloads/"$workload_prefix"glsmworkloadr_"$levelIn"_"$sizeRatio"_"$value_size".spec
+    life_times=(20000)
     __modifyConfig directIOFlag "$directIOFlag"
     section=LRU
     if [ ! -d "$dirname" ]; then
@@ -51,13 +51,18 @@ function __runLSM(){
     do
 	echo life_time "$life_time"
 	__modifyConfig LifeTime "$life_time"
-        ./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true -requestdistribution "$requestdistribution" -zipfianconst "$zipfianconst" > "$runname"_changeRatio"$cR"_lifetime"$life_time".txt
-	sync;echo 1 > /proc/sys/vm/drop_caches
-	mv "$runname"_changeRatio"$cR"_lifetime"$life_time".txt "$dirname"/
-	mv testlf1.txt "$dirname"/latency_"$runname"_changeRatio"$cR"_lifetime"$life_time".txt
-	mv nlf1.txt "$dirname"/nlatency_"$runname"_changeRatio"$cR"_lifetime"$life_time".txt
-	mv level?_access_frequencies.txt "$dirname"/
-        sleep 100s
+	if [ x$workload_prefix != x ]
+        then
+	    ./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true -requestdi\stribution "$requestdistribution" -zipfianconst "$zipfianconst" 
+	else
+            ./ycsbc -db leveldb -threads 1 -P $workloadr_name -dbfilename "$dbfilename" -configpath "$configpath" -skipLoad true -requestdistribution "$requestdistribution" -zipfianconst "$zipfianconst" > "$runname"_changeRatio"$cR"_lifetime"$life_time".txt
+	    sync;echo 1 > /proc/sys/vm/drop_caches
+	    mv "$runname"_changeRatio"$cR"_lifetime"$life_time".txt "$dirname"/
+	    mv testlf1.txt "$dirname"/latency_"$runname"_changeRatio"$cR"_lifetime"$life_time".txt
+	    mv nlf1.txt "$dirname"/nlatency_"$runname"_changeRatio"$cR"_lifetime"$life_time".txt
+	    mv level?_access_frequencies.txt "$dirname"/
+            sleep 100s
+	fi
     done
     cp configDir/leveldb_config.ini "$dirname"/
     section=basic
@@ -70,13 +75,14 @@ level=6
 sizeRatio=10
 dbfilename="$dbfilename_o"l"$level"s"$sizeRatio"b"$bloombits"
 FilterCapacityRatios=(7.0)
-blockCacheSizes=(0 32) #MB
+blockCacheSizes=(0) #MB
 changeRatios=(0.0001)
 initFilterNum=2
 directIOFlag=true
 requestdistribution=zipfian
 zipfianconsts=(0.99)
 bitsArrayFilename=/home/ming/workspace/bitsArray655555.txt
+workload_prefix=$1
 echo "$dbfilename"
 __modifyConfig bitsArrayFilename "$bitsArrayFilename"
 for blockCacheSize in ${blockCacheSizes[@]}

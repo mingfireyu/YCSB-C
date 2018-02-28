@@ -5,7 +5,7 @@ DISK=SSD"$experiment_time"
 dbfilename_o=/home/ming/"$DISK"_"$value_size"/mlsm
 configpath=./configDir/leveldb_config.ini
 section=basic
-
+arrayname=755555
 function __modifyConfig(){
     key=$1
     value=$2
@@ -68,7 +68,7 @@ lsmtype=(lsm)
 bloombits=8
 level=6
 sizeRatio=10
-dbfilename="$dbfilename_o"l"$level"s"$sizeRatio"b"$bloombits"
+dbfilename="$dbfilename_o"l"$level"s"$sizeRatio"b"$bloombits"a"$arrayname"
 FilterCapacityRatios=(8.0)
 blockCacheSizes=(0) #MB
 changeRatios=(0.0001)
