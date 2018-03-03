@@ -31,6 +31,9 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
   if(!end_flag_){
     db->Init();
     fp_phase = fopen("phase_time.txt","w");
+    if(fp_phase == NULL){
+      fprintf(stderr,"open phase_time error\n");
+    }
   }
   size_t ops[3] = {0,0,0};
   double durations[] = {0,0,0};
@@ -92,9 +95,13 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
     cerr<<"oks = " << oks<<endl;
     cout<<"Total time of insert: "<<res_time.tv_sec * 1000000 + res_time.tv_usec<<"us"<<endl;
     cout<<"Per insert time: "<<(res_time.tv_sec * 1000000 + res_time.tv_usec)*1.0/oks<<"us"<<endl;
+    end_flag_ = true;
   }
   //  end_flag_ = true;
   db->Close();
+  if(fp_phase){
+    fclose(fp_phase);
+  }
   return oks;
 }
 

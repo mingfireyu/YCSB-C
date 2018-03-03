@@ -29,6 +29,7 @@ function __loadLSM(){
 	mkdir  -p "$dirname"
     fi
     mv "$loadname" "$dirname"
+    mv phase_time.txt "$dirname"/phase_time_"$loadname"
     cp configDir/leveldb_config.ini "$dirname"
 }
 
@@ -95,7 +96,7 @@ do
 		dirname=/home/ming/experiment/lsm_"$DISK"_read_"$requestdistribution"/experiment"$experiment_time"_"$value_size"/bloombits"$bloombits"level"$level"/open_files_"$maxOpenfiles"_notfound_100WRead_directIO"$directIOFlag"_blockCacheSize"$blockCacheSize"MB_sizeRatio"$sizeRatio"
 	    fi
 	    __loadLSM trim_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" 
-	    __runLSM trim_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" 
+	   # __runLSM trim_bloombits"$bloombits"_level"$level"_lsmtype_"$lsmtype" "$dirname" "$level"  "$lsmtype" "$bloombits" 
 	done
     done
 done
