@@ -77,7 +77,7 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
     cout<<"Zero-result lookup: "<<endl;
     cout<<durations[2]/ops[2]<<"us"<<" Zero-result ops: "<<ops[2]<<endl;
     db->doSomeThing("printStats");
-    //    db->doSomeThing("printAccessFreq");
+    // db->doSomeThing("printAccessFreq");
     if(wl->adjust_filter_&&!end_flag_){
       db->doSomeThing("printAccessFreq");
       end_flag_ = true;
@@ -96,6 +96,7 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
   db->Close();
   if(fp_phase != NULL){
     fclose(fp_phase);
+    fp_phase = NULL;
   }
   return oks;
 }
