@@ -35,8 +35,8 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
       fprintf(stderr,"open phase_time error\n");
     }
   }
-  size_t ops[3] = {0,0,0};
-  double durations[] = {0,0,0};
+  size_t ops[] = {0,0,0,0};
+  double durations[] = {0,0,0,0};
   ycsbc::Client client(*db, *wl);
   size_t oks = 0;
   std::string out_string;
@@ -82,7 +82,10 @@ size_t DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const size_t num_o
     cout<<durations[ycsbc::Operation::READ]/ops[ycsbc::Operation::READ]<<"us "<<"Read ops: "<<ops[ycsbc::Operation::READ]<<endl;
     cout<<"Zero-result lookup: "<<endl;
     cout<<durations[2]/ops[2]<<"us"<<" Zero-result ops: "<<ops[2]<<endl;
+    cout<<"IOPS:"<<endl;
+    cout<<ops[3]/(durations[3]/1000000)<<endl;
     db->doSomeThing("printStats");
+
     if(!end_flag_){
       end_flag_ = true;
       ycsbc::CoreWorkload nwl;
